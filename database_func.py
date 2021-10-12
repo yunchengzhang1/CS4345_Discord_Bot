@@ -7,7 +7,7 @@ class database_func:
     def __init__(self):
         load_dotenv()
         connection_config_dict = {
-            'user': os.getenv('USER'),
+            'user': os.getenv('ROOT'),
             'password': os.getenv('PASSWORD'),
             'host': os.getenv('HOST'),
             'database': os.getenv('DATABASE'),
@@ -34,7 +34,7 @@ class database_func:
         data = (class_name, server)
         self.cursor.execute(insert_stmt, data)
         self.connection.commit()
-        print("Inserted successfully" % class_name)
+        print("Inserted successfully" + class_name)
 
     def delete_class(self, class_name):
         delete_stmt = "delete from Classes where class_name = %s"
@@ -52,9 +52,10 @@ class database_func:
             print(x)
 
     def print_all_users(self):
-        select_stmt = "select* from Users"
+        select_stmt = "select * from Users"
         self.cursor.execute(select_stmt)
         results = self.cursor.fetchall()
+        return results
         for x in results:
             print(x)
 
@@ -62,6 +63,7 @@ class database_func:
         select_stmt = "select* from Classes"
         self.cursor.execute(select_stmt)
         results = self.cursor.fetchall()
+        return results
         for x in results:
             print(x)
 
