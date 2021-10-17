@@ -36,6 +36,13 @@ class database_func:
         self.connection.commit()
         print("Inserted successfully" % class_name)
 
+    def delete_user(self, name):
+        delete_stmt = "delete from Users where username = %s"
+        data = (name,)
+        self.cursor.execute(delete_stmt, data)
+        self.connection.commit()
+        print("delete %s successfully" % name)
+
     def delete_class(self, class_name):
         delete_stmt = "delete from Classes where class_name = %s"
         data = (class_name,)
@@ -43,10 +50,10 @@ class database_func:
         self.connection.commit()
         print("delete %s successfully" % class_name)
 
-    def users_in_class(self,class_id):
-        select_stmt ="select Users.username from Users join Enrollments on Users.user_id = Enrollments.user_id where Enrollments.class_id =%s"
+    def users_in_class(self, class_id):
+        select_stmt = "select Users.username from Users join Enrollments on Users.user_id = Enrollments.user_id where Enrollments.class_id =%s"
         data = (class_id,)
-        self.cursor.execute(select_stmt,data)
+        self.cursor.execute(select_stmt, data)
         results = self.cursor.fetchall()
         for x in results:
             print(x)
@@ -64,6 +71,20 @@ class database_func:
         results = self.cursor.fetchall()
         for x in results:
             print(x)
+
+    def update_user(self,name,server,time_zone):
+        update_stmt = "update Users set username = %s , servers = %s, time_zone = %s where username = %s;"
+        data = (name,server,time_zone)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update %s successfully" % name)
+
+    def update_class(self,classname,server):
+        update_stmt = "update Classes set class_name = %s, servers = %s where class_name =%s"
+        data = (classname,server)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update %s successfully" % classname)
 
     def disconnect(self):
         # make sure to disconnect database after finish everything
