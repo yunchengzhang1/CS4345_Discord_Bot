@@ -56,27 +56,27 @@ class basic(commands.Cog):
                 await message.add_reaction(emoji)
 
     @commands.command(name="addClass")  # Create a new class
-    async def add_class(self, ctx, arg1: str, arg2: str):
-        self.test.add_class(arg1, arg2)
-        await ctx.send("Class added with name " + arg1 + "classname "+ arg2)
+    async def add_class(self, ctx, class_name: str, server_name: str):
+        self.test.add_class(class_name, server_name)
+        await ctx.send("Class added with name " + class_name + "classname "+ server_name)
 
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
-    async def getUsersInClass(self,ctx, arg1):
-        await ctx.send("Users in class {}: ".format(self.test.users_in_class(arg1)))
+    async def getUsersInClass(self,ctx, class_id):
+        await ctx.send("Users in class {}: ".format(self.test.users_in_class(class_id)))
 
     @commands.command(name="addUser")  # Add a user to a server
-    async def addUser(self, ctx, arg1, arg2, arg3):
-        self.test.add_user(arg1, arg2, arg3)
-        await ctx.send("User {} added to server {} on timesize {}".format(arg1, arg2, arg3))
+    async def addUser(self, ctx, user_name, server_name, timezone):
+        self.test.add_user(user_name, server_name, timezone)
+        await ctx.send("User {} added to server {} on timezone {}".format(user_name, server_name, timezone))
 
     @commands.command(name="getUsers")  # Print all existing users
     async def getUsers(self, ctx):
         await ctx.send("Current existing users: {}".format(self.test.print_all_users()))
 
     @commands.command(name="deleteClass")
-    async def deleteClass(self, ctx, argg):  # Take class_name input as string and then deletes class from table
-        self.test.delete_class(argg)
-        await ctx.send("Deleted class: {}".format(argg))
+    async def deleteClass(self, ctx, class_name):  # Take class_name input as string and then deletes class from table
+        self.test.delete_class(class_name)
+        await ctx.send("Deleted class: {}".format(class_name))
 
     @commands.command(name="getClasses")
     async def getClasses(self, ctx):
