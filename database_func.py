@@ -7,7 +7,7 @@ class database_func:
     def __init__(self):
         load_dotenv()
         connection_config_dict = {
-            'user': os.getenv('USER'),
+            'user': os.getenv('ROOT'),
             'password': os.getenv('PASSWORD'),
             'host': os.getenv('HOST'),
             'database': os.getenv('DATABASE'),
