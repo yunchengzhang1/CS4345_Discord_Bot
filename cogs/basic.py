@@ -4,10 +4,15 @@ from datetime import datetime, timedelta
 from discord import Embed
 from datetime import datetime, timedelta
 import time
+import mysql.connector
+from mysql.connector import Error
+from database_func import database_func
+
 class basic(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.test = database_func()
 
 
     @commands.command()
@@ -49,6 +54,33 @@ class basic(commands.Cog):
 
             for emoji in numbers[:len(options)]:
                 await message.add_reaction(emoji)
+
+    @commands.command(name="addClass")  # Create a new class
+    async def add_class(self, ctx, arg1: str, arg2: str):
+        self.test.add_class(arg1, arg2)
+        await ctx.send("Class added with name " + arg1 + "classname "+ arg2)
+
+    @commands.command(name="getUsersInClass")  # Return all users that are in this class
+    async def getUsersInClass(self,ctx, arg1):
+        await ctx.send("Users in class {}: ".format(self.test.users_in_class(arg1)))
+
+    @commands.command(name="addUser")  # Add a user to a server
+    async def addUser(self, ctx, arg1, arg2, arg3):
+        self.test.add_user(arg1, arg2, arg3)
+        await ctx.send("User {} added to server {} on timesize {}".format(arg1, arg2, arg3))
+
+    @commands.command(name="getUsers")  # Print all existing users
+    async def getUsers(self, ctx):
+        await ctx.send("Current existing users: {}".format(self.test.print_all_users()))
+
+    @commands.command(name="deleteClass")
+    async def deleteClass(self, ctx, argg):  # Take class_name input as string and then deletes class from table
+        self.test.delete_class(argg)
+        await ctx.send("Deleted class: {}".format(argg))
+
+    @commands.command(name="getClasses")
+    async def getClasses(self, ctx):
+        await ctx.send("Current existing classes: {}".format(self.test.print_all_class()))
 
 
 

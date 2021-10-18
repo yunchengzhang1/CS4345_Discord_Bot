@@ -7,7 +7,7 @@ class database_func:
     def __init__(self):
         load_dotenv()
         connection_config_dict = {
-            'user': os.getenv('USER'),
+            'user': os.getenv('ROOT'),
             'password': os.getenv('PASSWORD'),
             'host': os.getenv('HOST'),
             'database': os.getenv('DATABASE'),
@@ -29,12 +29,18 @@ class database_func:
         self.connection.commit()
         print("Inserted successfully")
 
-    def add_class(self, class_name, server):
+    def add_class(self, class_name:str, server:str):
         insert_stmt = "insert into Classes (class_name,servers)""Values (%s, %s)"
         data = (class_name, server)
         self.cursor.execute(insert_stmt, data)
         self.connection.commit()
-        print("Inserted successfully" % class_name)
+
+    def add_enrollment(self, user_id, class_id):
+        insert_stmt = "insert into Enrollments (user_id, class_id, date_enrolled)""Values (%s, %s, NOW())"
+        data = (user_id, class_id)
+        self.cursor.execute(insert_stmt, data)
+        self.connection.commit()
+        print("Inserted successfully")
 
     def delete_user(self, name):
         delete_stmt = "delete from Users where username = %s"
