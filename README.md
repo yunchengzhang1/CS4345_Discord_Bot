@@ -10,6 +10,7 @@ Next, create a ```.env``` file with:
 ROOT = 
 PASSWORD = 
 HOST = 
-DATABASE = ```
+DATABASE = 
+```
 
 After that, the bot should run. 
