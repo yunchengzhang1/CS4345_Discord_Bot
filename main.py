@@ -5,11 +5,16 @@ from discord.ext import commands
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-bot = discord.Client()
-
+print(TOKEN)
 bot = commands.Bot(command_prefix='!', help_command=None)
-@bot.command(name="test")
-async def test(ctx):
-    await ctx.send("hello world")
+
+
+for file in os.listdir("./cogs"):
+    if file.endswith(".py"):
+        bot.load_extension(f'cogs.{file[:-3]}')
 
 bot.run(TOKEN)
+
+
+
+# bot.run(TOKEN)
