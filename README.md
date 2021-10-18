@@ -6,7 +6,8 @@ Clone or download this repository. In the directory's terminal, run ```pip3 inst
 
 Next, create a ```.env``` file with: 
 
-```DISCORD_TOKEN = 
+```
+DISCORD_TOKEN = 
 ROOT = 
 PASSWORD = 
 HOST = 
