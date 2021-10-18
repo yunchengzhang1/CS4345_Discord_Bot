@@ -36,6 +36,13 @@ class database_func:
         self.connection.commit()
         print("Inserted successfully" % class_name)
 
+    def add_enrollment(self, user_id, class_id): 
+        insert_stmt = "insert into Enrollments (user_id, class_id, date_enrolled)""Values (%s, %s, NOW())"
+        data = (user_id, class_id)
+        self.cursor.execute(insert_stmt, data)
+        self.connection.commit()
+        print("Inserted successfully")
+
     def delete_user(self, name):
         delete_stmt = "delete from Users where username = %s"
         data = (name,)
@@ -65,6 +72,14 @@ class database_func:
         for x in results:
             print(x)
 
+    def get_class(self, class_id): 
+        select_stmt = "select class_name from Classes where class_id = %s"
+        data = (class_id,)
+        self.cursor.execute(select_stmt, data)
+        results = self.cursor.fetchall()
+        for x in results: 
+            print(x)
+
     def print_all_class(self):
         select_stmt = "select* from Classes"
         self.cursor.execute(select_stmt)
@@ -90,3 +105,5 @@ class database_func:
         # make sure to disconnect database after finish everything
         self.cursor.close()
         self.connection.close()
+
+    
