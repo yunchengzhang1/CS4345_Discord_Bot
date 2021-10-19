@@ -1,4 +1,7 @@
+import discord as d
+from discord import channel
 import discord
+from discord import guild
 from discord.ext import commands
 from datetime import datetime, timedelta
 from discord import Embed
@@ -61,7 +64,15 @@ class basic(commands.Cog):
     async def add_class(self, ctx, class_name: str, server_name: str):
         self.test.add_class(class_name, server_name)
         await ctx.send("Class added with name " + class_name + "classname "+ server_name)
-
+        guild = ctx.guild
+        mbed = d.Embed(
+            tile = 'Success',
+            description = "{} has been successfully created.".format(class_name)
+        )
+        if ctx.author.guild_permissions.manage_channels:
+            await guild.create_text_channel(name = '{}'.format(class_name))
+            await ctx.send(embed=mbed)
+            
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
     async def getUsersInClass(self,ctx, class_id):
         await ctx.send("Users in class {}: ".format(self.test.users_in_class(class_id)))
@@ -76,9 +87,17 @@ class basic(commands.Cog):
         await ctx.send("Current existing users: {}".format(self.test.print_all_users()))
 
     @commands.command(name="deleteClass")
-    async def deleteClass(self, ctx, class_name):  # Take class_name input as string and then deletes class from table
+    async def deleteClass(self, ctx, class_name, channel: d.TextChannel):  # Take class_name input as string and then deletes class from table
         self.test.delete_class(class_name)
         await ctx.send("Deleted class: {}".format(class_name))
+        mbed = d.Embed(
+            tile = 'Success',
+            description = "{} has been successfully deleted.".format(class_name)
+        )
+        if ctx.author.guild_permissions.manage_channels:
+            await ctx.send(embed=mbed)
+            await channel.delete()
+            
 
     @commands.command(name="getClasses")
     async def getClasses(self, ctx):
