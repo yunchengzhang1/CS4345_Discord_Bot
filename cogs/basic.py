@@ -7,6 +7,8 @@ import time
 import mysql.connector
 from mysql.connector import Error
 from database_func import database_func
+from datetime import datetime
+import asyncio
 
 class basic(commands.Cog):
 
@@ -82,7 +84,15 @@ class basic(commands.Cog):
     async def getClasses(self, ctx):
         await ctx.send("Current existing classes: {}".format(self.test.print_all_class()))
 
-
+    @commands.command(name="reminder")
+    async def reminder(self, ctx, date: str, *message):
+        reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+        today = datetime.now()
+        diff = (reminder - today).total_seconds()
+        msg = " ".join(message)
+        await ctx.send("a reminder is set up for " + date + " for " + msg)
+        await asyncio.sleep(diff)
+        await ctx.send("Reminder: " + msg)
 
     async def complete_poll(self, channel_id, message_id):
         message = await self.bot.get_channel(channel_id).fetch_message(message_id)
