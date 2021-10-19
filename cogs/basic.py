@@ -1,5 +1,9 @@
 from discord.ext import commands
 from discord import Embed
+import discord
+import discord as d
+from discord import channel
+from discord import guild
 from database_func import database_func
 from datetime import datetime
 import asyncio
@@ -15,6 +19,34 @@ class basic(commands.Cog):
     async def test(self, ctx):
         await ctx.send("Edward test")
     #     test
+
+    @commands.command()
+    async def announcement(self, ctx, title, *description):
+        msg = ' '.join(description)
+        embed = Embed(title=title,
+                      description= msg,
+                      colour=ctx.author.colour,
+                      timestamp=datetime.utcnow())
+        embed.set_author(name= ctx.author)
+
+        message = await ctx.send(embed=embed)
+        await message.pin()
+    @announcement.error
+    async def announcement_error(self, ctx: commands.Context, error: commands.CommandError):
+        # reminder error handling
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+        await ctx.send(message, delete_after=10)
+        # await ctx.message.delete(delay=5)
+
 
     @commands.command()
     async def ping(self, ctx):
@@ -87,10 +119,18 @@ class basic(commands.Cog):
     @commands.command(name="addClass")  # Create a new class
     async def add_class(self, ctx, class_name: str, server_name: str):
         self.test.add_class(class_name, server_name)
-        await ctx.send("Class added with name " + class_name + "classname "+ server_name)
+        await ctx.send("Class added with name " + class_name + "classname " + server_name)
+        guild = ctx.guild
+        mbed = d.Embed(
+            tile='Success',
+            description="{} has been successfully created.".format(class_name)
+        )
+        if ctx.author.guild_permissions.manage_channels:
+            await guild.create_text_channel(name='{}'.format(class_name))
+            await ctx.send(embed=mbed)
 
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
-    async def getUsersInClass(self,ctx, class_id):
+    async def getUsersInClass(self, ctx, class_id):
         await ctx.send("Users in class {}: ".format(self.test.users_in_class(class_id)))
 
     @commands.command(name="addUser")  # Add a user to a server
@@ -103,9 +143,17 @@ class basic(commands.Cog):
         await ctx.send("Current existing users: {}".format(self.test.print_all_users()))
 
     @commands.command(name="deleteClass")
-    async def deleteClass(self, ctx, class_name):  # Take class_name input as string and then deletes class from table
+    async def deleteClass(self, ctx, class_name,
+                          channel: d.TextChannel):  # Take class_name input as string and then deletes class from table
         self.test.delete_class(class_name)
         await ctx.send("Deleted class: {}".format(class_name))
+        mbed = d.Embed(
+            tile='Success',
+            description="{} has been successfully deleted.".format(class_name)
+        )
+        if ctx.author.guild_permissions.manage_channels:
+            await ctx.send(embed=mbed)
+            await channel.delete()
 
     @commands.command(name="getClasses")
     async def getClasses(self, ctx):
@@ -126,7 +174,7 @@ class basic(commands.Cog):
     #     time up
 
     @reminder.error
-    async def example_error(self, ctx: commands.Context, error: commands.CommandError):
+    async def reminder_error(self, ctx: commands.Context, error: commands.CommandError):
         # reminder error handling
         if isinstance(error, commands.CommandOnCooldown):
             message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
