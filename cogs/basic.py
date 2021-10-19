@@ -1,25 +1,20 @@
-import discord
 from discord.ext import commands
-from datetime import datetime, timedelta
 from discord import Embed
-from datetime import datetime, timedelta
-import time
-import mysql.connector
-from mysql.connector import Error
 from database_func import database_func
 from datetime import datetime
 import asyncio
 
 class basic(commands.Cog):
-
+    # this file store basic commands
     def __init__(self, bot):
         self.bot = bot
         self.test = database_func()
 
 
     @commands.command()
-    async def testED (self, ctx):
+    async def test(self, ctx):
         await ctx.send("Edward test")
+    #     test
 
     @commands.command()
     async def ping(self, ctx):
@@ -31,10 +26,12 @@ class basic(commands.Cog):
         latency = str(latency)
         # The latency is sent to the user
         await ctx.send(f'Pong! `{latency}ms`')
+    #     test latency
 
-    # a polling feature that Edward is working on
+
     @commands.command()
-    async def create_poll(self, ctx, hours: int, question: str, *options):
+    async def create_poll(self, ctx, seconds: int, question: str, *options):
+        # create a poll
         if len(options) > 10:
             await ctx.send("You can only supply a maximum of 10 options.")
 
@@ -45,17 +42,47 @@ class basic(commands.Cog):
                           description=question,
                           colour=ctx.author.colour,
                           timestamp=datetime.utcnow())
-
+            # create a embed
             fields = [("Options", "\n".join([f"{numbers[idx]} {option}" for idx, option in enumerate(options)]), False),
                       ("Instructions", "React to cast a vote!", False)]
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
-
+            # configure and add fields
             message = await ctx.send(embed=embed)
+            # send message
 
             for emoji in numbers[:len(options)]:
                 await message.add_reaction(emoji)
+            #     add reaction
+
+            await asyncio.sleep(seconds)
+            # sleep for a designated time to wait for result
+
+            message = await self.bot.get_channel(message.channel.id).fetch_message(message.id)
+
+            most_voted = max(message.reactions, key=lambda r: r.count)
+
+            await message.channel.send(
+                f"The results are in and option {most_voted.emoji} was the most popular with {most_voted.count - 1:,} votes!")
+    #         conclude the result
+
+    @create_poll.error
+    async def poll_error(self, ctx: commands.Context, error: commands.CommandError):
+        # error handling for poll error
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+
+        await ctx.send(message, delete_after=10)
+        # await ctx.message.delete(delay=5)
 
     @commands.command(name="addClass")  # Create a new class
     async def add_class(self, ctx, class_name: str, server_name: str):
@@ -86,23 +113,34 @@ class basic(commands.Cog):
 
     @commands.command(name="reminder")
     async def reminder(self, ctx, date: str, *message):
+        # reminder feature
         reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
         today = datetime.now()
         diff = (reminder - today).total_seconds()
+        # find the difference in seconds and wait
         msg = " ".join(message)
         await ctx.send("a reminder is set up for " + date + " for " + msg)
         await asyncio.sleep(diff)
+        # reminder sleeping
         await ctx.send("Reminder: " + msg)
+    #     time up
 
-    async def complete_poll(self, channel_id, message_id):
-        message = await self.bot.get_channel(channel_id).fetch_message(message_id)
+    @reminder.error
+    async def example_error(self, ctx: commands.Context, error: commands.CommandError):
+        # reminder error handling
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
 
-        most_voted = max(message.reactions, key=lambda r: r.count)
-
-        await message.channel.send(
-            f"The results are in and option {most_voted.emoji} was the most popular with {most_voted.count - 1:,} votes!")
-
-
+        await ctx.send(message, delete_after=10)
+        # await ctx.message.delete(delay=5)
 
 
 def setup(bot):
