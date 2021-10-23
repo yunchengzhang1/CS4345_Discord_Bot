@@ -17,6 +17,7 @@ class basic(commands.Cog):
 
     @commands.command()
     async def help(self, ctx):
+        # display all available commands
         author = ctx.message.author
         embed = Embed(title="Help",
                       colour=ctx.author.colour)
@@ -24,15 +25,17 @@ class basic(commands.Cog):
         embed.add_field(name="!ping", value="Pong", inline=False)
         embed.add_field(name="!test", value="Author test", inline=False)
         embed.add_field(name="!announcement title(str) *description(str)", value="Create an announcement", inline=False)
-        embed.add_field(name="create_poll seconds(int) question(string) *options(string)", value="Create a poll", inline=False)
+        embed.add_field(name="!create_poll seconds(int) question(string) *options(string)", value="Create a poll", inline=False)
         embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder", inline=False)
+        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder", inline=False)
+        embed.add_field(name="!status @[valid ping]", value="Check other's activity", inline=False)
 
         embed.set_footer(text="* value can be multiple values, other can only accept one value")
         await ctx.send(author, embed=embed)
 
     @commands.command()
     async def test(self, ctx):
-        await ctx.send(ctx.message.author + "  test")
+        await ctx.send(ctx.message.author.display_name + "  test")
 
     @commands.command()
     async def announcement(self, ctx, title, *description):
@@ -76,7 +79,33 @@ class basic(commands.Cog):
         await ctx.send(f'Pong! `{latency}ms`')
 
     #     test latency
+    @commands.command()
+    async def status(self, ctx, member: discord.Member):
+        # https://discordpy.readthedocs.io/en/stable/intents.html
+        # https://stackoverflow.com/questions/67149879/how-to-get-user-activity-in-discord-py
+        if member.activity is None:
+            await ctx.send(member.display_name+" is not doing anything now")
+        else:
+            await ctx.send(member.activity.type)
+            await ctx.send(member.activity.name)
+        return
 
+    @status.error
+    async def status_error(self, ctx: commands.Context, error: commands.CommandError):
+        # error handling for status error
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+
+        await ctx.send(message, delete_after=10)
+        # await ctx.message.delete(delay=5)
     @commands.command()
     async def create_poll(self, ctx, seconds: int, question: str, *options):
         # create a poll
