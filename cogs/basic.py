@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import Embed
 import discord
 import discord as d
@@ -14,6 +14,51 @@ class basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.test = database_func()
+        self.playtime = {}
+
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("HELLO")
+        while True:
+            for guild in self.bot.guilds:
+                for member in guild.members:
+                    # get all members in a server
+                    if not member.bot:
+                        # if user is not a bot
+                        if member.name not in self.playtime:
+                            # add user to the dict if not existed
+                            self.playtime[member.name] = {}
+
+                        if member.activity is not None:
+                            # start playing
+                            currActType = str(member.activity.type)
+                            if "ActivityType." in currActType:
+                                currActType = currActType.replace("ActivityType.", "")
+                            currActname = member.activity.name
+                            activity = currActType + " " + currActname
+                            if member.name in self.playtime:
+                                # user is in dict
+                                dict = self.playtime[member.name]
+                                if activity not in dict:
+                                    dict[activity] = 0
+                                    #starting to play a game
+                                else:
+                                    dict[activity] += 5
+                                    #continue playing a game
+                            else:
+                                self.playtime[member.name] = {activity: 0}
+                                # user is not in dict, record his activity rarely happens
+
+            await asyncio.sleep(5)
+    #         this will check and record user activities every 5 seconds
+
+
+
+
+
+
+
 
     @commands.command()
     async def help(self, ctx):
@@ -29,6 +74,8 @@ class basic(commands.Cog):
         embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder", inline=False)
         embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder", inline=False)
         embed.add_field(name="!status @[valid ping]", value="Check other's activity", inline=False)
+        embed.add_field(name="!status_self", value="Check your time playing all video games", inline=False)
+
 
         embed.set_footer(text="* value can be multiple values, other can only accept one value")
         await ctx.send(author, embed=embed)
@@ -86,9 +133,78 @@ class basic(commands.Cog):
         if member.activity is None:
             await ctx.send(member.display_name+" is not doing anything now")
         else:
-            await ctx.send(member.activity.type)
-            await ctx.send(member.activity.name)
+            type = str(member.activity.type)
+            if "ActivityType." in type:
+                type = type.replace("ActivityType.", "")
+                if "custom" not in type:
+                    await ctx.send(member.name + " is " + type + " " + member.activity.name)
+                else:
+                    await ctx.send(member.name + " is doing " + member.activity.name)
+
         return
+
+    @commands.command()
+    async def status_self(self, ctx):
+        msg = ctx.author.name +"\n"
+        dict = self.playtime[ctx.author.name]
+        for key in dict:
+            msg = msg + key + " for " + str(dict[key]) + " seconds\n"
+
+        await ctx.send(msg)
+
+    @tasks.loop(seconds=5)
+    async def collect_play_time(self, ctx):
+        if ctx.author.activity is None:
+            # if the activity is none
+            if self.currActType != "" and self.currActname != "":
+                # if th player quit a game
+                if self.currActType in self.playtime:
+                    self.playtime[self.currActType].append((self.currActname,self.time))
+                    #  if the key exist
+                else:
+                    # if the key does not exist
+                    self.playtime[self.currActType] =[(self.currActname,self.time)]
+                self.time = 0
+                self.currActType = ""
+                self.currActname = ""
+        elif ctx.author.activity is not None and self.currActType == "" and self.currActname == "":
+            # start playing
+            self.currActType = str(ctx.author.activity.type)
+            if "ActivityType." in self.currActType:
+                self.currActType = self.currActType.replace("ActivityType.", "")
+            self.currActname = ctx.author.activity.name
+
+        elif ctx.author.activity is not None and self.currActType != "" and self.currActname != "":
+            # players switch game immediately, usually there is a buffer time where game 1 quit -> none -> game 2
+            # so this case happen very infrequently
+            if self.currActType in self.playtime:
+                self.playtime[self.currActType].append((self.currActname, self.time))
+                #  if the player is playing a different game
+                #  if the key exist
+            else:
+                # if the key does not exist
+                self.playtime[self.currActType] = [(self.currActname, self.time)]
+            self.time = 0
+            self.currActType = str(ctx.author.activity.type)
+            self.currActname = ctx.author.activity.name
+
+
+        elif self.currActType == str(ctx.author.activity.type) and self.currActname == ctx.author.activity.name:
+            self.time = self.time + 5
+        #     the player status has not changed
+        else:
+            pass
+
+
+
+
+        # if member.activity is None:
+        #     await ctx.send(member.display_name + " is not doing anything now")
+        # else:
+        #     await ctx.send(ctx.author.activity.type)
+        #     await ctx.send(member.activity.type)
+        #     await ctx.send(member.activity.name)
+
 
     @status.error
     async def status_error(self, ctx: commands.Context, error: commands.CommandError):

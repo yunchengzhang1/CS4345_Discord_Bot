@@ -20,5 +20,6 @@ for file in os.listdir("./cogs"):
         bot.load_extension(f'cogs.{file[:-3]}')
         # load all commands from cog folder
 # set up bot
+
 bot.run(TOKEN)
 # run bot
