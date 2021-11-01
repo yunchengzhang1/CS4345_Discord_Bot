@@ -64,23 +64,20 @@ class basic(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def add_class(self, ctx, class_name: str, server_name: str):
         self.test.add_class(class_name, server_name)
-        await ctx.send(class_name+ " has been created!")
         guild = ctx.guild
-        mbed = d.Embed(
-            tile = 'Success',
-            description = "{} has been successfully created.".format(class_name)
-        )
         if ctx.author.guild_permissions.manage_channels:
             role = await guild.create_role(name = class_name,colour=discord.Colour(0xff0000))
             authour = ctx.message.author
             await authour.add_roles(role)
-            await ctx.send(f'Role `{class_name}` has been created')
+            message = await ctx.send(f'Class `{class_name}` has been created! \nReact below to join.')
+            await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
             newChannel = await guild.create_text_channel(name = '{}'.format(class_name),)
             member = guild.default_role
             await newChannel.set_permissions(member, view_channel = False)
             await newChannel.set_permissions(role, view_channel = True, send_messages=True)
-            await ctx.send(embed=mbed)
-            
+    def on_reaction_add(reaction, user, role):
+            if reaction =='\N{WHITE HEAVY CHECK MARK}' :
+                user.add_roles(role)
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
     async def getUsersInClass(self,ctx, class_id):
         await ctx.send("Users in class {}: ".format(self.test.users_in_class(class_id)))
