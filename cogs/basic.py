@@ -16,6 +16,11 @@ class basic(commands.Cog):
         self.bot = bot
         self.test = database_func()
 
+    @commands.command()
+    async def dm(self, ctx, user:discord.Member, *message):
+        msg = " ".join(message)
+        embed = discord.Embed(title=msg)
+        await user.send(embed=embed) 
 
     @commands.command()
     async def testED (self, ctx):
