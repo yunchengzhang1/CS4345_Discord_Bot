@@ -18,7 +18,6 @@ class database_func:
             db_Info = self.connection.get_server_info()
             print("Connected to MySQL Server version ", db_Info)
             self.cursor = self.connection.cursor()
-            print(db_Info)
 
     def add_user(self, name, server, timezone):
         # insert a user into the user table given
