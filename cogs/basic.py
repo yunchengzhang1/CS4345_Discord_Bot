@@ -16,7 +16,6 @@ class basic(commands.Cog):
         self.test = database_func()
         self.playtime = {}
 
-
     @commands.Cog.listener()
     async def on_ready(self):
         print("HELLO")
@@ -42,23 +41,26 @@ class basic(commands.Cog):
                                 dict = self.playtime[member.name]
                                 if activity not in dict:
                                     dict[activity] = 0
-                                    #starting to play a game
+                                    # starting to play a game
                                 else:
                                     dict[activity] += 5
-                                    #continue playing a game
+                                    # continue playing a game
                             else:
                                 self.playtime[member.name] = {activity: 0}
                                 # user is not in dict, record his activity rarely happens
 
             await asyncio.sleep(5)
+
     #         this will check and record user activities every 5 seconds
 
-
-
-
-
-
-
+    @commands.command()
+    async def dm(self, ctx, user: discord.Member, *message):
+        msg = " ".join(message)
+        embed = discord.Embed(title=msg)
+        # await ctx.send(ctx.author)
+        # await ctx.send(user)
+        # await ctx.send("HELLLO")
+        await ctx.author.send(embed=embed)
 
     @commands.command()
     async def help(self, ctx):
@@ -70,12 +72,14 @@ class basic(commands.Cog):
         embed.add_field(name="!ping", value="Pong", inline=False)
         embed.add_field(name="!test", value="Author test", inline=False)
         embed.add_field(name="!announcement title(str) *description(str)", value="Create an announcement", inline=False)
-        embed.add_field(name="!create_poll seconds(int) question(string) *options(string)", value="Create a poll", inline=False)
-        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder", inline=False)
-        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder", inline=False)
+        embed.add_field(name="!create_poll seconds(int) question(string) *options(string)", value="Create a poll",
+                        inline=False)
+        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder",
+                        inline=False)
+        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder",
+                        inline=False)
         embed.add_field(name="!status @[valid ping]", value="Check other's activity", inline=False)
         embed.add_field(name="!status_self", value="Check your time playing all video games", inline=False)
-
 
         embed.set_footer(text="* value can be multiple values, other can only accept one value")
         await ctx.send(author, embed=embed)
@@ -112,8 +116,6 @@ class basic(commands.Cog):
         await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
-
-
     @commands.command()
     async def ping(self, ctx):
 
@@ -131,7 +133,7 @@ class basic(commands.Cog):
         # https://discordpy.readthedocs.io/en/stable/intents.html
         # https://stackoverflow.com/questions/67149879/how-to-get-user-activity-in-discord-py
         if member.activity is None:
-            await ctx.send(member.display_name+" is not doing anything now")
+            await ctx.send(member.display_name + " is not doing anything now")
         else:
             type = str(member.activity.type)
             if "ActivityType." in type:
@@ -145,7 +147,7 @@ class basic(commands.Cog):
 
     @commands.command()
     async def status_self(self, ctx):
-        msg = ctx.author.name +"\n"
+        msg = ctx.author.name + "\n"
         dict = self.playtime[ctx.author.name]
         for key in dict:
             msg = msg + key + " for " + str(dict[key]) + " seconds\n"
@@ -159,11 +161,11 @@ class basic(commands.Cog):
             if self.currActType != "" and self.currActname != "":
                 # if th player quit a game
                 if self.currActType in self.playtime:
-                    self.playtime[self.currActType].append((self.currActname,self.time))
+                    self.playtime[self.currActType].append((self.currActname, self.time))
                     #  if the key exist
                 else:
                     # if the key does not exist
-                    self.playtime[self.currActType] =[(self.currActname,self.time)]
+                    self.playtime[self.currActType] = [(self.currActname, self.time)]
                 self.time = 0
                 self.currActType = ""
                 self.currActname = ""
@@ -195,16 +197,12 @@ class basic(commands.Cog):
         else:
             pass
 
-
-
-
         # if member.activity is None:
         #     await ctx.send(member.display_name + " is not doing anything now")
         # else:
         #     await ctx.send(ctx.author.activity.type)
         #     await ctx.send(member.activity.type)
         #     await ctx.send(member.activity.name)
-
 
     @status.error
     async def status_error(self, ctx: commands.Context, error: commands.CommandError):
@@ -222,6 +220,7 @@ class basic(commands.Cog):
 
         await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
+
     @commands.command()
     async def create_poll(self, ctx, seconds: int, question: str, *options):
         # create a poll
@@ -246,7 +245,6 @@ class basic(commands.Cog):
             poll = await ctx.send(embed=embed)
             # send poll
 
-
             for emoji in numbers[:len(options)]:
                 await poll.add_reaction(emoji)
             #     add reaction
@@ -265,6 +263,7 @@ class basic(commands.Cog):
                 f"The results are in and option {most_voted.emoji} was the most popular with {most_voted.count - 1:,} votes!\n Poll is removed from pinned messages")
 
             await poll.unpin()
+
     #         conclude the result and unpin the poll
 
     @create_poll.error
@@ -329,18 +328,21 @@ class basic(commands.Cog):
 
     @commands.command(name="reminder")
     async def reminder(self, ctx, date: str, *message):
-        # reminder feature
-        reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
-        today = datetime.now()
-        diff = (reminder - today).total_seconds()
-        # find the difference in seconds and wait
-        msg = " ".join(message)
-        await ctx.send("a reminder is set up for " + date + " for " + msg)
-        await asyncio.sleep(diff)
-        # reminder sleeping
-        await ctx.send("Reminder: " + msg)
-
-    #     time up
+        # reminder group feature
+        try:
+            reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+        except Exception as e:
+            await ctx.send(e)
+        else:
+            today = datetime.now()
+            diff = (reminder - today).total_seconds()
+            # find the difference in seconds and wait
+            msg = " ".join(message)
+            await ctx.send("a reminder is set up for " + date + " for " + msg)
+            await asyncio.sleep(diff)
+            # reminder sleeping
+            await ctx.send("Reminder: " + msg)
+            # time up
 
     @reminder.error
     async def reminder_error(self, ctx: commands.Context, error: commands.CommandError):
@@ -357,6 +359,40 @@ class basic(commands.Cog):
             message = "Oh no! Something went wrong while running the command!"
 
         await ctx.send(message, delete_after=10)
+        # await ctx.message.delete(delay=5)
+
+    @commands.command()
+    async def reminder_self(self, ctx, date: str, *message):
+        # reminder for self only
+        try:
+            reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+        except Exception as e:
+            await ctx.author.send(e)
+        else:
+            today = datetime.now()
+            diff = (reminder - today).total_seconds()
+            # find the difference in seconds and wait
+            msg = " ".join(message)
+            await ctx.author.send("a reminder is set up for " + date + " for " + msg)
+            await asyncio.sleep(diff)
+            # reminder sleeping
+            await ctx.author.send("Reminder: " + msg)
+
+    @reminder_self.error
+    async def reminder_self_error(self, ctx: commands.Context, error: commands.CommandError):
+        # reminder error handling
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+
+        await ctx.author.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
 
