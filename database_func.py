@@ -41,6 +41,29 @@ class database_func:
         self.connection.commit()
         print("Inserted successfully")
 
+    def add_task(self,user_id,task_name, diff, deadline, class_name):
+        insert_stmt = "insert into Tasks (user_id,task_name,difficulty,deadline,class_name)""Values (%s,%s,%s,%s,%s)"
+        data = [user_id , task_name , diff , deadline , class_name]
+        self.cursor.execute(insert_stmt,data)
+        self.connection.commit()
+        print("Inserted successfully")
+        
+        
+    def get_tasks_month(self,user_id:int):
+        select_stmt = "SELECT * from Tasks t where t.user_id = (user_id) and DATEDIFF(t.deadline,NOW()) < 30"
+        self.cursor.execute(select_stmt,user_id)
+        results = self.cursor.fetchall()
+        for x in results:
+            print(x)
+    
+    def get_tasks_week(self,user_id:int):
+        select_stmt = "SELECT * from Tasks t where t.user_id = (user_id) and DATEDIFF(t.deadline,NOW()) < 7"
+        self.cursor.execute(select_stmt,user_id)
+        results = self.cursor.fetchall()
+        for x in results:
+            print(x)
+    
+        
     def delete_user(self, name):
         delete_stmt = "delete from Users where username = %s"
         data = (name,)
@@ -57,7 +80,7 @@ class database_func:
 
     def users_in_class(self, class_id):
         select_stmt = "select Users.username from Users join Enrollments on Users.user_id = Enrollments.user_id where Enrollments.class_id =%s"
-        data = (class_id,)
+        data = (class_id)
         self.cursor.execute(select_stmt, data)
         results = self.cursor.fetchall()
         for x in results:
