@@ -10,7 +10,7 @@ After that, the bot should run.
 
 Requirements:
 
-_WORKING_ User shall be able to join a group/class through reacting to a message.
+_WORKING_ User shall be able to join a group/class through reacting to a message.\n
 _WORKING_ User shall be assigned a specific role for the group/class upon joining.
 _WORKING_ User shall be able to leave a group/class through reacting to a message.
 _WORKING_ User shall be able to create tasks that are associated with the group/class if they have administrative privileges. 
