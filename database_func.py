@@ -50,16 +50,18 @@ class database_func:
         
         
     def get_tasks_month(self,user_id:int):
-        select_stmt = "SELECT * from Tasks t where t.user_id = (user_id) and DATEDIFF(t.deadline,NOW()) < 30"
-        self.cursor.execute(select_stmt,user_id)
+        select_stmt = "SELECT * from Tasks t where t.user_id = %s and DATEDIFF(t.deadline,NOW()) < 30"
+        data = (user_id,)
+        self.cursor.execute(select_stmt,data)
         results = self.cursor.fetchall()
         for x in results:
             print(x)
         return results
     
     def get_tasks_week(self,user_id:int):
-        select_stmt = "SELECT * from Tasks t where t.user_id = (user_id) and DATEDIFF(t.deadline,NOW()) < 7"
-        self.cursor.execute(select_stmt,user_id)
+        select_stmt = "SELECT * from Tasks t where t.user_id = %s and DATEDIFF(t.deadline,NOW()) < 7"
+        data = (user_id,)
+        self.cursor.execute(select_stmt,data)
         results = self.cursor.fetchall()
         for x in results:
             print(x)
