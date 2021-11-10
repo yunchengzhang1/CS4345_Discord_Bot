@@ -225,7 +225,7 @@ class basic(commands.Cog):
                 competeSecond) + " seconds \n"
         await ctx.send(msg)
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(hours=12)
     async def show_play_time(self):
         for guild in self.bot.guilds:
             for member in guild.members:
@@ -503,11 +503,13 @@ class basic(commands.Cog):
             title = title
             difficulty = int(difficulty)
             deadline = datetime.strptime(deadline,format_deadline)
+            
 
         except Exception as e:
             await ctx.send(e)
         else:
             self.test.add_task(user_id,title,difficulty,deadline,class_name)
+            await ctx.send("Task added")
             
     @add_task.error
     async def add_task_error(self,ctx: commands.context, error: commands.CommandError):
