@@ -79,6 +79,19 @@ class database_func:
         self.connection.commit()
         print("delete %s successfully" % class_name)
 
+    def delete_task(self,task_name):
+        delete_stmt = "delete from Tasks where task_name = %s"
+        data = (task_name)
+        self.cursor.execute(delete_stmt, data)
+        self.connection.commit()
+        print("delete %s successfully" % task_name)
+    
+    def delete_expired_tasks(self):
+        delete_stmt = "delete from Tasks where deadline < NOW()"
+        self.cursor.execute(delete_stmt)
+        self.connection.commit()
+        print("delete expired tasks successfully")
+
     def users_in_class(self, class_id):
         select_stmt = "select Users.username from Users join Enrollments on Users.user_id = Enrollments.user_id where Enrollments.class_id =%s"
         data = (class_id)

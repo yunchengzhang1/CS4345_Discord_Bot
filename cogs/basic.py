@@ -410,6 +410,9 @@ class basic(commands.Cog):
             message = await ctx.send(f'Class `{class_name}` has been created! \nReact below to join.')
             reaction = await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
+    
+     
+    
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
     async def getUsersInClass(self, ctx, class_id):
         await ctx.send("Users in class {}: ".format(self.test.users_in_class(class_id)))
@@ -497,7 +500,6 @@ class basic(commands.Cog):
     async def add_task(self,ctx, title, difficulty, deadline, class_name):
         format_deadline = '%Y-%m-%d-%H:%M'
         try:
-
             user_id = ctx.message.author.id
             user_id = int(user_id/100000000)
             title = title
@@ -507,10 +509,9 @@ class basic(commands.Cog):
 
         except Exception as e:
             await ctx.send(e)
-        else:
+        else:     
             self.test.add_task(user_id,title,difficulty,deadline,class_name)
             await ctx.send("Task added")
-            
     @add_task.error
     async def add_task_error(self,ctx: commands.context, error: commands.CommandError):
         if isinstance(error, commands.CommandOnCooldown):
@@ -526,22 +527,71 @@ class basic(commands.Cog):
 
         await ctx.send(message, delete_after=10)
     
+    
+    
+    @commands.command(name="deleteClass")
+    async def deleteClass(self, ctx, class_name, channel: d.TextChannel):  # Take class_name input as string and then deletes class from table
+        self.test.delete_class(class_name)
+        role_object = discord.utils.get(ctx.message.guild.roles, name=class_name)
+        await ctx.send("Deleted class: {}".format(class_name))
+        await role_object.delete()
+        mbed = d.Embed(
+            tile = 'Success',
+            description = "{} has been successfully deleted.".format(class_name)
+        )
+        if ctx.author.guild_permissions.manage_channels:
+            await ctx.send(embed=mbed)
+            await channel.delete()
+    @commands.command()
+    async def delete_task(self,ctx,task_name):
+        self.test.delete_task(task_name)
+        await ctx.send("Task deleted")
+    
+    @tasks.loop(minutes=1)
+    async def remove_expired_tasks(self):
+        self.test.remove_expired_tasks()
+
+    
+    @delete_task.error
+    async def delete_task_error(self,ctx: commands.context, error: commands.CommandError):
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+
+        await ctx.send(message, delete_after=10)
+        
+    
     @commands.command()
     async def taskm(self,ctx):
-        x = self.test.get_tasks_month(int(ctx.message.author.id/100000000))
-        await ctx.send("There are {} tasks due in the next month".format(len(x)))
+        user_id = int(ctx.message.author.id/100000000)
+        x = self.test.get_tasks_month(user_id)
+        tasks_as_user = [a for a in x if a[1] == user_id]
+        await ctx.send("There are {} tasks due in the next month".format(len(tasks_as_user)))
         for i in x:
-            s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
-            await ctx.send(s)
+            if i[1] == user_id:
+                s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
+                await ctx.send(s)
         #await ctx.send("List of tasks due the next thirty days: {}".format(self.test.get_tasks_month(int(ctx.message.author.id)/100000000)))
     
     @commands.command()
     async def taskw(self,ctx):
-        x = self.test.get_tasks_week(int(ctx.message.author.id)/100000000)
-        await ctx.send("There are {} tasks due in the next week".format(len(x)))
+        user_id = int(ctx.message.author.id/100000000)
+        x = self.test.get_tasks_week(user_id)
+        tasks_as_user = [a for a in x if a[1] == user_id]
+        await ctx.send("There are {} tasks due in the next week".format(len(tasks_as_user)))
         for i in x:
-            s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
-            await ctx.send(s)    
+            if i[1] == user_id:
+                s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
+                await ctx.send(s)
+        #await ctx.send("List of tasks due the next thirty days: {}".format(self.test.get_tasks_month(int(ctx.message.author.id)/100000000)))
+              
     @reminder_self.error
     async def reminder_self_error(self, ctx: commands.Context, error: commands.CommandError):
         # reminder error handling
