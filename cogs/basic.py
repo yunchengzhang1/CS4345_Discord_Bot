@@ -284,17 +284,20 @@ class basic(commands.Cog):
         # await ctx.message.delete(delay=5)
 
     @commands.command(name="addClass")  # Create a new class
+    @commands.has_permissions(manage_roles=True)
     async def add_class(self, ctx, class_name: str, server_name: str):
         self.test.add_class(class_name, server_name)
-        await ctx.send("Class added with name " + class_name + "classname " + server_name)
         guild = ctx.guild
-        mbed = d.Embed(
-            tile='Success',
-            description="{} has been successfully created.".format(class_name)
-        )
         if ctx.author.guild_permissions.manage_channels:
-            await guild.create_text_channel(name='{}'.format(class_name))
-            await ctx.send(embed=mbed)
+            role = await guild.create_role(name = class_name,colour=discord.Colour(0xff0000))
+            authour = ctx.message.author
+            await authour.add_roles(role)
+            newChannel = await guild.create_text_channel(name = '{}'.format(class_name),)
+            member = guild.default_role
+            await newChannel.set_permissions(member, view_channel = False)
+            await newChannel.set_permissions(role, view_channel = True, send_messages=True)
+            message = await ctx.send(f'Class `{class_name}` has been created! \nReact below to join.')
+            reaction = await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
     async def getUsersInClass(self, ctx, class_id):
@@ -310,13 +313,14 @@ class basic(commands.Cog):
         await ctx.send("Current existing users: {}".format(self.test.print_all_users()))
 
     @commands.command(name="deleteClass")
-    async def deleteClass(self, ctx, class_name,
-                          channel: d.TextChannel):  # Take class_name input as string and then deletes class from table
+    async def deleteClass(self, ctx, class_name, channel: d.TextChannel):  # Take class_name input as string and then deletes class from table
         self.test.delete_class(class_name)
+        role_object = discord.utils.get(ctx.message.guild.roles, name=class_name)
         await ctx.send("Deleted class: {}".format(class_name))
+        await role_object.delete()
         mbed = d.Embed(
-            tile='Success',
-            description="{} has been successfully deleted.".format(class_name)
+            tile = 'Success',
+            description = "{} has been successfully deleted.".format(class_name)
         )
         if ctx.author.guild_permissions.manage_channels:
             await ctx.send(embed=mbed)
