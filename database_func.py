@@ -55,6 +55,7 @@ class database_func:
         results = self.cursor.fetchall()
         for x in results:
             print(x)
+        return results
     
     def get_tasks_week(self,user_id:int):
         select_stmt = "SELECT * from Tasks t where t.user_id = (user_id) and DATEDIFF(t.deadline,NOW()) < 7"
@@ -62,7 +63,7 @@ class database_func:
         results = self.cursor.fetchall()
         for x in results:
             print(x)
-    
+        return results
         
     def delete_user(self, name):
         delete_stmt = "delete from Users where username = %s"

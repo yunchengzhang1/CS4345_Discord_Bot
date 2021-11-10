@@ -410,9 +410,21 @@ class basic(commands.Cog):
         await ctx.send(message, delete_after=10)
     
     @commands.command()
-    async def get_monthly_tasks(self,ctx):
-        await ctx.send("List of tasks due the next thirty days: {}".format(self.test.get_tasks_month(int(ctx.message.author.id)/100000000)))
+    async def taskm(self,ctx):
+        x = self.test.get_tasks_month(int(ctx.message.author.id/100000000))
+        await ctx.send("There are {} tasks due in the next month".format(len(x)))
+        for i in x:
+            s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
+            await ctx.send(s)
+        #await ctx.send("List of tasks due the next thirty days: {}".format(self.test.get_tasks_month(int(ctx.message.author.id)/100000000)))
     
+    @commands.command()
+    async def taskw(self,ctx):
+        x = self.test.get_tasks_week(int(ctx.message.author.id)/100000000)
+        await ctx.send("There are {} tasks due in the next week".format(len(x)))
+        for i in x:
+            s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
+            await ctx.send(s)    
     @reminder_self.error
     async def reminder_self_error(self, ctx: commands.Context, error: commands.CommandError):
         # reminder error handling
