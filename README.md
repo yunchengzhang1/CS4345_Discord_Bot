@@ -25,7 +25,6 @@ _WORKING_ User shall be able to assign other users to specific tasks within a gr
 _WORKING_ User shall be able to access a new channel upon joining a group/class.<br/>
 _WORKING_ User shall be able to see all present members who are a part of the group/class.<br/>
 _WORKING_ User shall be able to modify deadlines if they have administrative privileges.<br/>
-_WORKING_ User shall be able to see how frequently people are participating in meetings <br/>
 _WORKING_ User shall be able to see the event time zone automatically converted to their local time zone <br/>
 
 _DONE_ User shall be able to set up goals about how much time they plan on studying or playing games<br/>
@@ -41,6 +40,7 @@ _DONE_ User shall be able to set up a timer to keep track of the time they spend
 _DONE_ User shall be able to set a reminder that will be client based and be sent through a direct message.<br/>
 _DONE_ User shall be able to receive notifications from the bot through direct messaging or server pings. <br/>
 
+_DISCARD_ User shall be able to see how frequently people are participating in meetings <br/>
 
 
 
