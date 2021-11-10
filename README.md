@@ -12,20 +12,22 @@ Requirements:
 
 _WORKING_ User shall be able to join a group/class through reacting to a message. <br/>
 _WORKING_ User shall be assigned a specific role for the group/class upon joining.<br/>
-_WORKING_ User shall be able to leave a group/class through reacting to a message.<br/>
 _WORKING_ User shall be able to create tasks that are associated with the group/class if they have administrative privileges. <br/>
 _WORKING_ User shall be able to assign deadlines to newly created tasks if they have administrative privileges. <br/>
 _WORKING_ User shall be able to assign a difficulty rating to newly created tasks if they have administrative privileges. <br/>
 _WORKING_ User shall be able to type in a command to see all of their tasks for the day/week/month.<br/>
 _WORKING_ User shall be able to create a group/class if they have administrative privileges.<br/>
 _WORKING_ User shall be able to see their deadlines and meeting times for the day/week/month.<br/>
-_WORKING_ User shall be able to ban or remove other user from a group if they have administrative privileges.<br/>
 _WORKING_ User shall be able to access all the groups if they have administrative privileges.<br/>
 _WORKING_ User shall be able to assign other users to specific tasks within a group if they have administrative privileges.<br/>
 _WORKING_ User shall be able to access a new channel upon joining a group/class.<br/>
 _WORKING_ User shall be able to see all present members who are a part of the group/class.<br/>
 _WORKING_ User shall be able to modify deadlines if they have administrative privileges.<br/>
 _WORKING_ User shall be able to see the event time zone automatically converted to their local time zone <br/>
+
+_WORKING_ User shall be able to leave a group/class through reacting to a message.<br/>
+_WORKING_ User shall be able to ban or remove other user from a group if they have administrative privileges.<br/>
+
 
 _DONE_ User shall be able to set up goals about how much time they plan on studying or playing games<br/>
 _DONE_ User shall be able to use our discord bot to schedule meetings at a given time with given amount of people<br/>
