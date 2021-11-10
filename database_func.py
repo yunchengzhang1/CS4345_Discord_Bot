@@ -4,20 +4,36 @@ import os
 
 
 class database_func:
+    __instance = None
+
+    @staticmethod
+    def getInstance():
+        # singleton pattern to make sure only
+        # one instance of database connection is running
+        if database_func.__instance is None:
+            database_func()
+        return database_func.__instance
+
+
     def __init__(self):
-        load_dotenv()
-        connection_config_dict = {
-            'user': os.getenv('ROOT'),
-            'password': os.getenv('PASSWORD'),
-            'host': os.getenv('HOST'),
-            'database': os.getenv('DATABASE'),
-            'raise_on_warnings': True,
-        }
-        self.connection = mysql.connector.connect(**connection_config_dict)
-        if self.connection.is_connected():
-            db_Info = self.connection.get_server_info()
-            print("Connected to MySQL Server version ", db_Info)
-            self.cursor = self.connection.cursor()
+        if database_func.__instance is None:
+            load_dotenv()
+            connection_config_dict = {
+                'user': os.getenv('ROOT'),
+                'password': os.getenv('PASSWORD'),
+                'host': os.getenv('HOST'),
+                'database': os.getenv('DATABASE'),
+                'raise_on_warnings': True,
+            }
+            self.connection = mysql.connector.connect(**connection_config_dict)
+            if self.connection.is_connected():
+                db_Info = self.connection.get_server_info()
+                print("Connected to MySQL Server version ", db_Info)
+                self.cursor = self.connection.cursor()
+            database_func.__instance = self
+        else:
+            print("This is singleton, you cannot have multiple objects")
+
 
     def add_user(self, name, server, timezone):
         # insert a user into the user table given
