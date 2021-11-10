@@ -18,7 +18,6 @@ _WORKING_ User shall be able to assign deadlines to newly created tasks if they 
 _WORKING_ User shall be able to assign a difficulty rating to newly created tasks if they have administrative privileges. <br/>
 _WORKING_ User shall be able to type in a command to see all of their tasks for the day/week/month.<br/>
 _WORKING_ User shall be able to create a group/class if they have administrative privileges.<br/>
-_WORKING_ User shall be able to add times for meetings or classes upon creating the group/class.<br/>
 _WORKING_ User shall be able to see their deadlines and meeting times for the day/week/month.<br/>
 _WORKING_ User shall be able to ban or remove other user from a group if they have administrative privileges.<br/>
 _WORKING_ User shall be able to access all the groups if they have administrative privileges.<br/>
@@ -26,13 +25,14 @@ _WORKING_ User shall be able to assign other users to specific tasks within a gr
 _WORKING_ User shall be able to access a new channel upon joining a group/class.<br/>
 _WORKING_ User shall be able to see all present members who are a part of the group/class.<br/>
 _WORKING_ User shall be able to modify deadlines if they have administrative privileges.<br/>
-_WORKING_ User shall be able to use our discord bot to schedule meetings at a given time with given amount of people<br/>
-_WORKING_ User shall be able to set an alert to automatically remind people when meeting is approaching <br/>
-_WORKING_ User shall be able to be reminded of deadlines if they keep procrastinating <br/>
-_WORKING_ User shall be able to set up goals about how much time they plan on studying or playing games<br/>
 _WORKING_ User shall be able to see how frequently people are participating in meetings <br/>
 _WORKING_ User shall be able to see the event time zone automatically converted to their local time zone <br/>
 
+_DONE_ User shall be able to set up goals about how much time they plan on studying or playing games<br/>
+_DONE_ User shall be able to use our discord bot to schedule meetings at a given time with given amount of people<br/>
+_DONE_ User shall be able to add times for meetings or classes upon creating the group/class.<br/>
+_DONE_ User shall be able to be reminded of deadlines if they keep procrastinating <br/>
+_DONE_ User shall be able to set an alert to automatically remind people when meeting is approaching <br/>
 _DONE_ User shall be able to send an announcement to the entire server or to a specific group in the server. <br/>
 _DONE_ User shall be able to send out a poll to the entire server or to a specific group in the server.<br/>
 _DONE_ User shall be able to set up custom reminder for events that will happen in the future <br/>
