@@ -55,7 +55,7 @@ class basic(commands.Cog):
 
     @commands.command()
     async def test(self, ctx):
-        await ctx.send(ctx.message.author.display_name + "  test")
+        await ctx.send(ctx.message.author.display_name + " test")
 
     @commands.command()
     async def meeting(self,ctx, title, date:str, valid_until, location, *description):
@@ -604,7 +604,7 @@ class basic(commands.Cog):
         await ctx.send("Current existing classes: {}".format(self.test.print_all_class()))
 
     @commands.command(name="reminder")
-    async def reminder(self, ctx, date: str, *message):
+    async def reminder(self, ctx,date: str, title, *message):
         # reminder group feature
         try:
             reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
@@ -618,7 +618,12 @@ class basic(commands.Cog):
             await ctx.send("a reminder is set up for " + date + " for " + msg)
             await asyncio.sleep(diff)
             # reminder sleeping
-            await ctx.send("Reminder: " + msg)
+            embed = Embed(title="Reminder "+title,
+                          description=msg,
+                          colour=ctx.author.colour,
+                          timestamp=datetime.utcnow())
+            embed.set_author(name=ctx.author)
+            await ctx.send(embed =embed)
             # time up
 
     @reminder.error
