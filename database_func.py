@@ -96,18 +96,16 @@ class database_func:
 
     def users_in_class(self, class_id):
         select_stmt = "select Users.username from Users join Enrollments on Users.user_id = Enrollments.user_id where Enrollments.class_id =%s"
-        data = (class_id)
+        data = (class_id,)
         self.cursor.execute(select_stmt, data)
         results = self.cursor.fetchall()
-        for x in results:
-            print(x)
+        return results
 
     def print_all_users(self):
-        select_stmt = "select* from Users"
+        select_stmt = "select username from Users"
         self.cursor.execute(select_stmt)
         results = self.cursor.fetchall()
-        for x in results:
-            print(x)
+        return results
 
     def print_all_class(self):
         select_stmt = "select* from Classes"
