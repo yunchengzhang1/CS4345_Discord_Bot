@@ -14,46 +14,16 @@ class basic(commands.Cog):
     # this file store basic commands
     def __init__(self, bot):
         self.bot = bot
+        self.collect_play_time.start()
         self.show_play_time.start()
+        self.warn_play_time.start()
         self.test = database_func()
         self.playtime = {}
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print("HELLO")
-        while True:
-            for guild in self.bot.guilds:
-                for member in guild.members:
-                    # get all members in a server
-                    if not member.bot:
-                        # if user is not a bot
-                        if member.name not in self.playtime:
-                            # add user to the dict if not existed
-                            self.playtime[member.name] = {}
+    # @commands.Cog.listener()
+    # async def on_ready(self):
+    #     print("HELLO")
 
-                        if member.activity is not None:
-                            # start playing
-                            currActType = str(member.activity.type)
-                            if "ActivityType." in currActType:
-                                currActType = currActType.replace("ActivityType.", "")
-                            currActname = member.activity.name
-                            activity = currActType + " " + currActname
-                            if member.name in self.playtime:
-                                # user is in dict
-                                dict = self.playtime[member.name]
-                                if activity not in dict:
-                                    dict[activity] = 0
-                                    # starting to play a game
-                                else:
-                                    dict[activity] += 5
-                                    # continue playing a game
-                            else:
-                                self.playtime[member.name] = {activity: 0}
-                                # user is not in dict, record his activity rarely happens
-
-            await asyncio.sleep(5)
-
-    #         this will check and record user activities every 5 seconds
 
     @commands.command()
     async def dm(self, ctx, user: discord.Member, *message):
@@ -86,6 +56,104 @@ class basic(commands.Cog):
     @commands.command()
     async def test(self, ctx):
         await ctx.send(ctx.message.author.display_name + "  test")
+
+    @commands.command()
+    async def meeting(self,ctx, title, date:str, location, *description):
+        try:
+            meettime = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+        except Exception as e:
+            await ctx.send(e)
+        else:
+            msg = ' '.join(description)
+            embed = Embed(title=title,
+                          description=msg,
+                          colour=ctx.author.colour,
+                          timestamp=datetime.utcnow())
+            embed.set_author(name=ctx.author)
+            embed.add_field(name="Date ", value= str(meettime), inline=False)
+            embed.add_field(name="Location ", value= location, inline=False)
+            await ctx.send(embed=embed)
+
+    @meeting.error
+    async def meeting_error(self, ctx: commands.Context, error: commands.CommandError):
+        # reminder error handling
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+        await ctx.send(message, delete_after=10)
+        # await ctx.message.delete(delay=5)
+
+    @tasks.loop(seconds= 5)
+    async def collect_play_time(self):
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                # get all members in a server
+                if not member.bot:
+                    # if user is not a bot
+                    if member.name not in self.playtime:
+                        # add user to the dict if not existed
+                        self.playtime[member.name] = {}
+
+                    if member.activity is not None:
+                        # start playing
+                        currActType = str(member.activity.type)
+                        if "ActivityType." in currActType:
+                            currActType = currActType.replace("ActivityType.", "")
+                        currActname = member.activity.name
+                        activity = currActType + " " + currActname
+                        if member.name in self.playtime:
+                            # user is in dict
+                            dict = self.playtime[member.name]
+                            if activity not in dict:
+                                dict[activity] = 0
+                                # starting to play a game
+                            else:
+                                dict[activity] += 5
+                                # continue playing a game
+                        else:
+                            self.playtime[member.name] = {activity: 0}
+                            # user is not in dict, record his activity rarely happens
+        #         this will check and record user activities every 5 seconds
+
+    @tasks.loop(seconds=60)
+    async def warn_play_time(self):
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                # get all members in a server
+                if not member.bot:
+                    msg = member.name + "\n"
+                    dict = self.playtime[member.name]
+                    activityTime = 0
+                    for key in dict:
+                        activityTime = dict[key]
+                        # get certain activity time
+                        activityHour = math.floor(activityTime / 3600)
+                        # find the hours spend
+                        activityTime = activityTime % 3600
+                        # reduce the time to find minutes
+                        activityMinute = math.floor(activityTime / 60)
+                        # find the minute spend
+                        activityTime = activityTime % 60
+                        activitySecond = activityTime
+
+                        msg = msg + key + " for " + str(activityHour) + " hours " + str(
+                            activityMinute) + " minutes " + str(activitySecond) + " seconds\n"
+
+                    if activityTime > 3600:
+                        try:
+                            if (msg != member.name):
+                                msg = msg+"You have exceeded your planned play time, please make sure that you are actively doing work\n"
+                                await member.send(msg)
+                        except:
+                            print("cannot send to this user")
+
 
     @commands.command()
     async def announcement(self, ctx, title, *description):
