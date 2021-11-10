@@ -58,9 +58,18 @@ class basic(commands.Cog):
         await ctx.send(ctx.message.author.display_name + "  test")
 
     @commands.command()
-    async def meeting(self,ctx, title, date:str, location, *description):
+    async def meeting(self,ctx, title, date:str, valid_until, location, *description):
         try:
+            today = datetime.now()
             meettime = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+            valid_time = datetime.strptime(valid_until, "%Y-%m-%d-%H:%M")
+            if today >= meettime:
+                await ctx.send("Your meeting time must be after now")
+                return
+            if today >= valid_time:
+                await ctx.send("Your valid registration time must be after now")
+                return
+
         except Exception as e:
             await ctx.send(e)
         else:
@@ -72,22 +81,58 @@ class basic(commands.Cog):
             embed.set_author(name=ctx.author)
             embed.add_field(name="Date ", value= str(meettime), inline=False)
             embed.add_field(name="Location ", value= location, inline=False)
-            await ctx.send(embed=embed)
+            message = await ctx.send(embed=embed)
+            await message.pin()
+            await message.add_reaction('👍')
+            await message.add_reaction('👎')
+            today = datetime.now()
+            diff = (valid_time - today).total_seconds()
+            await ctx.send(title +" registration starts now and finishes at "+str(valid_until))
+            await asyncio.sleep(diff)
+            meeting_txt = await self.bot.get_channel(message.channel.id).fetch_message(message.id)
+            for reaction in meeting_txt.reactions:
+                if reaction.emoji =='👍':
+                    async for user in reaction.users():
+                        if not user.bot:
+                            await ctx.send(user.name +" is coming ")
+                elif reaction.emoji =='👎':
+                    async for user in reaction.users():
+                        if not user.bot:
+                            await ctx.send(user.name +" is not coming ")
+            await ctx.send("Registration finishes. "+title+ " will start at " + date)
+            today = datetime.now()
+            diff = (meettime - today).total_seconds()
+            if diff < 900:
+                await ctx.send(title+ " is coming up within " +str(math.floor(diff/60)) +" minutes")
+                await asyncio.sleep(diff)
+                await ctx.send(title + " meeting time has come")
+            else:
+                reminder_time = diff-900
+                await asyncio.sleep(reminder_time)
+                await ctx.send("15 Minutes until "+title)
+                await asyncio.sleep(900)
+                await ctx.send(title+ " meeting time has come")
 
-    @meeting.error
-    async def meeting_error(self, ctx: commands.Context, error: commands.CommandError):
-        # reminder error handling
-        if isinstance(error, commands.CommandOnCooldown):
-            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
-        elif isinstance(error, commands.MissingPermissions):
-            message = "You are missing the required permissions to run this command!"
-        elif isinstance(error, commands.MissingRequiredArgument):
-            message = f"Missing a required argument: {error.param}"
-        elif isinstance(error, commands.ConversionError):
-            message = str(error)
-        else:
-            message = "Oh no! Something went wrong while running the command!"
-        await ctx.send(message, delete_after=10)
+
+
+
+
+
+
+    # @meeting.error
+    # async def meeting_error(self, ctx: commands.Context, error: commands.CommandError):
+    #     # reminder error handling
+    #     if isinstance(error, commands.CommandOnCooldown):
+    #         message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+    #     elif isinstance(error, commands.MissingPermissions):
+    #         message = "You are missing the required permissions to run this command!"
+    #     elif isinstance(error, commands.MissingRequiredArgument):
+    #         message = f"Missing a required argument: {error.param}"
+    #     elif isinstance(error, commands.ConversionError):
+    #         message = str(error)
+    #     else:
+    #         message = "Oh no! Something went wrong while running the command!"
+    #     await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
     @tasks.loop(seconds= 5)
