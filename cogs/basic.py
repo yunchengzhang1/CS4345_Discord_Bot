@@ -381,7 +381,54 @@ class basic(commands.Cog):
             await asyncio.sleep(diff)
             # reminder sleeping
             await ctx.author.send("Reminder: " + msg)
+            
+    @commands.command()
+    async def add_task(self,ctx, title, difficulty, deadline, class_name):
+        format_deadline = '%Y-%m-%d-%H:%M'
+        try:
 
+            user_id = ctx.message.author.id
+            user_id = int(user_id/100000000)
+            title = title
+            difficulty = int(difficulty)
+            deadline = datetime.strptime(deadline,format_deadline)
+
+        except Exception as e:
+            await ctx.send(e)
+        else:
+            self.test.add_task(user_id,title,difficulty,deadline,class_name)
+            
+    @add_task.error
+    async def add_task_error(self,ctx: commands.context, error: commands.CommandError):
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+
+        await ctx.send(message, delete_after=10)
+    
+    @commands.command()
+    async def taskm(self,ctx):
+        x = self.test.get_tasks_month(int(ctx.message.author.id/100000000))
+        await ctx.send("There are {} tasks due in the next month".format(len(x)))
+        for i in x:
+            s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
+            await ctx.send(s)
+        #await ctx.send("List of tasks due the next thirty days: {}".format(self.test.get_tasks_month(int(ctx.message.author.id)/100000000)))
+    
+    @commands.command()
+    async def taskw(self,ctx):
+        x = self.test.get_tasks_week(int(ctx.message.author.id)/100000000)
+        await ctx.send("There are {} tasks due in the next week".format(len(x)))
+        for i in x:
+            s = "{} is due on {} with difficulty {} and for class {}".format(i[2],i[4],i[3],i[5])
+            await ctx.send(s)    
     @reminder_self.error
     async def reminder_self_error(self, ctx: commands.Context, error: commands.CommandError):
         # reminder error handling
@@ -399,6 +446,6 @@ class basic(commands.Cog):
         await ctx.author.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
-
+    
 def setup(bot):
     bot.add_cog(basic(bot))
