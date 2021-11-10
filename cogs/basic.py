@@ -113,27 +113,73 @@ class basic(commands.Cog):
                 await asyncio.sleep(900)
                 await ctx.send(title+ " meeting time has come")
 
-
-
-
-
-
-
-    # @meeting.error
-    # async def meeting_error(self, ctx: commands.Context, error: commands.CommandError):
-    #     # reminder error handling
-    #     if isinstance(error, commands.CommandOnCooldown):
-    #         message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
-    #     elif isinstance(error, commands.MissingPermissions):
-    #         message = "You are missing the required permissions to run this command!"
-    #     elif isinstance(error, commands.MissingRequiredArgument):
-    #         message = f"Missing a required argument: {error.param}"
-    #     elif isinstance(error, commands.ConversionError):
-    #         message = str(error)
-    #     else:
-    #         message = "Oh no! Something went wrong while running the command!"
-    #     await ctx.send(message, delete_after=10)
+    @meeting.error
+    async def meeting_error(self, ctx: commands.Context, error: commands.CommandError):
+        # reminder error handling
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+        await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
+
+    @commands.command()
+    async def mand_meeting(self, ctx, title, date: str, location, *users:discord.Member):
+    #     this is used for mandaytory meetings
+        try:
+            today = datetime.now()
+            meettime = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+            if today >= meettime:
+                await ctx.send("Your meeting time must be after now")
+                return
+        except Exception as e:
+            await ctx.send(e)
+        else:
+
+            embed = Embed(title="Mandatory " +title,
+                          colour=ctx.author.colour,
+                          timestamp=datetime.utcnow())
+            embed.set_author(name=ctx.author)
+            embed.add_field(name="Date ", value=str(meettime), inline=False)
+            embed.add_field(name="Location ", value=location, inline=False)
+            await ctx.send(embed=embed)
+            await ctx.send("The following people have to come")
+
+            for user in users:
+                await ctx.send(user)
+
+
+            today = datetime.now()
+            diff = (meettime -today).total_seconds()
+            if diff < 900:
+                await ctx.send(title + " is coming up within " + str(math.floor(diff / 60)) + " minutes")
+                await ctx.send("The following people need to show up")
+                for user in users:
+                    await ctx.send(user)
+                await asyncio.sleep(diff)
+                await ctx.send(title + " meeting time has come")
+            else:
+                reminder_time = diff - 900
+                await asyncio.sleep(reminder_time)
+                await ctx.send("15 Minutes until " + title)
+                await ctx.send("The following people need to show up")
+                for user in users:
+                    await ctx.send(user)
+                await asyncio.sleep(900)
+                await ctx.send(title + " meeting time has come")
+
+
+
+
+
+
+
 
     @tasks.loop(seconds= 5)
     async def collect_play_time(self):
