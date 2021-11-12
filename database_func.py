@@ -38,7 +38,7 @@ class database_func:
     def add_user(self, userid, username):
         # insert a user into the user table given
         # userid username
-        insert_stmt = "insert into Users (user_id, username)""Values (%s,%s)"
+        insert_stmt = "insert ignore into Users (user_id, username)""Values (%s,%s)"
         data = (userid, username)
         self.cursor.execute(insert_stmt, data)
         self.connection.commit()

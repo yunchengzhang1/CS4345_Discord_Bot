@@ -26,6 +26,10 @@ class basic(commands.Cog):
             if not member.bot:
                 self.test.add_user(member.id, member.name)
 
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        self.test.add_user(member.id, member.name)
+
     @commands.command()
     async def dm(self, ctx, user: discord.Member, *message):
         msg = " ".join(message)
