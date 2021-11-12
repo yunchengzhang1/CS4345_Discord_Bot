@@ -16,10 +16,15 @@ class basic(commands.Cog):
         self.bot = bot
         self.test = database_func.getInstance()
 
-    # @commands.Cog.listener()
-    # async def on_ready(self):
-    #     print("HELLO")
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("Bot ready")
 
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        for member in guild.members:
+            if not member.bot:
+                self.test.add_user(member.id, member.name)
 
     @commands.command()
     async def dm(self, ctx, user: discord.Member, *message):

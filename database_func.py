@@ -35,11 +35,11 @@ class database_func:
             print("This is singleton, you cannot have multiple objects")
 
 
-    def add_user(self, name, server, timezone):
+    def add_user(self, userid, username):
         # insert a user into the user table given
-        # username, serverid, and timezone
-        insert_stmt = "insert into Users (username,servers,time_zone)""Values (%s, %s,%s)"
-        data = (name, server, timezone)
+        # userid username
+        insert_stmt = "insert into Users (user_id, username)""Values (%s,%s)"
+        data = (userid, username)
         self.cursor.execute(insert_stmt, data)
         self.connection.commit()
         print("Inserted successfully")
