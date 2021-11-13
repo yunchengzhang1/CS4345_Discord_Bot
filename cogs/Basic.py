@@ -30,11 +30,16 @@ class basic(commands.Cog):
     async def on_member_join(self, member):
         self.test.add_user(member.id, member.name)
 
+    @commands.Cog.listener()
+    async def on_member_leave(self,member):
+        self.test.delete_user(member.id)
+
     @commands.command()
     async def dm(self, ctx, user: discord.Member, *message):
         msg = " ".join(message)
         embed = discord.Embed(title=msg)
         await user.send(embed=embed)
+
 
     @commands.command()
     async def help(self, ctx):
@@ -61,6 +66,7 @@ class basic(commands.Cog):
     @commands.command()
     async def test(self, ctx):
         await ctx.send(ctx.message.author.display_name + " test")
+        # await ctx.send(ctx.author.id)
 
 
 

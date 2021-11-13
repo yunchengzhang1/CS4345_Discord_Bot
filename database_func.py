@@ -83,12 +83,12 @@ class database_func:
             print(x)
         return results
         
-    def delete_user(self, name):
-        delete_stmt = "delete from Users where username = %s"
-        data = (name,)
+    def delete_user(self, userid):
+        delete_stmt = "delete from Users where user_id = %s"
+        data = (userid,)
         self.cursor.execute(delete_stmt, data)
         self.connection.commit()
-        print("delete %s successfully" % name)
+        print("delete successfully")
 
     def delete_class(self, class_name):
         delete_stmt = "delete from Classes where class_name = %s"
@@ -143,6 +143,78 @@ class database_func:
         self.cursor.execute(update_stmt, data)
         self.connection.commit()
         print("update %s successfully" % classname)
+
+    def activity_exist(self, userid, activity):
+        select_stmt = "SELECT * from Activities where user_id = %s and activity = %s"
+        data = (userid, activity)
+        self.cursor.execute(select_stmt,data)
+        results = self.cursor.fetchall()
+        if len(results) == 0:
+            return False
+        else:
+            return True
+
+    def get_user_activities(self,userid):
+        select_stmt = "SELECT activity, time from Activities where user_id = %s"
+        data = (userid, )
+        self.cursor.execute(select_stmt, data)
+        results = self.cursor.fetchall()
+        return results
+    # here we return list of tuples
+
+    def sum_user_activities(self,userid):
+        select_stmt = "select sum(time) from Activities where user_id = %s and activity not like %s"
+        data = (userid,"%custom%" )
+        self.cursor.execute(select_stmt, data)
+        result = self.cursor.fetchone()[0]
+        if result is None:
+            result = 0
+        return result
+
+    def get_playtime_limit_and_warning(self,userid):
+        select_stmt = "SELECT playtime_limit, is_warned from Users where user_id =%s"
+        data = (userid, )
+        self.cursor.execute(select_stmt, data)
+        result = self.cursor.fetchone()
+        return result
+    # return a tuple where [0] is limit and [1] is warned or not
+    def is_warned(self,userid):
+        update_stmt = "update Users set is_warned =1 where user_id =%s"
+        data = (userid,)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update successfully")
+    #     the user is warned
+
+
+
+
+
+
+
+
+
+
+
+
+    def add_activity(self, userid, activity):
+        insert_stmt = "insert into Activities (user_id,activity)""Values (%s,%s)"
+        data = [userid, activity]
+        self.cursor.execute(insert_stmt, data)
+        self.connection.commit()
+        print("Inserted successfully")
+
+    def update_activity(self,userid,activity):
+        update_stmt = "update Activities set time = time+10 where user_id =%s and activity =%s"
+        data = (userid,activity)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update %s successfully" % activity)
+
+
+
+
+
 
     def disconnect(self):
         # make sure to disconnect database after finish everything
