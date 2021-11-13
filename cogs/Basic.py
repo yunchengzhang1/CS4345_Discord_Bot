@@ -15,6 +15,7 @@ class basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.test = database_func.getInstance()
+        self.check_reminders.start()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -172,29 +173,52 @@ class basic(commands.Cog):
         await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
+    #
+    # @commands.command(name="reminder")
+    # async def reminder(self, ctx,date: str, title, *message):
+    #     # reminder group feature
+    #     try:
+    #         reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+    #     except Exception as e:
+    #         await ctx.send(e)
+    #     else:
+    #         today = datetime.now()
+    #         diff = (reminder - today).total_seconds()
+    #         # find the difference in seconds and wait
+    #         msg = " ".join(message)
+    #         await ctx.send("a reminder is set up for " + date + " for " + title)
+    #         await asyncio.sleep(diff)
+    #         # reminder sleeping
+    #         embed = Embed(title="Reminder "+title,
+    #                       description=msg,
+    #                       colour=ctx.author.colour,
+    #                       timestamp=datetime.utcnow())
+    #         embed.set_author(name=ctx.author)
+    #         await ctx.send(embed =embed)
+    #         # time up
 
     @commands.command(name="reminder")
     async def reminder(self, ctx,date: str, title, *message):
         # reminder group feature
         try:
             reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+
         except Exception as e:
             await ctx.send(e)
         else:
-            today = datetime.now()
-            diff = (reminder - today).total_seconds()
-            # find the difference in seconds and wait
             msg = " ".join(message)
-            await ctx.send("a reminder is set up for " + date + " for " + title)
-            await asyncio.sleep(diff)
-            # reminder sleeping
-            embed = Embed(title="Reminder "+title,
-                          description=msg,
-                          colour=ctx.author.colour,
-                          timestamp=datetime.utcnow())
-            embed.set_author(name=ctx.author)
-            await ctx.send(embed =embed)
-            # time up
+            message_sent = await ctx.send("a reminder is set up for " + date + " for " + title)
+            # await ctx.send(message_sent.channel.id)
+            self.test.add_reminder(message_sent.id,message_sent.channel.id,ctx.author.id, reminder, title,msg)
+
+
+
+
+
+            # message = await self.bot.get_channel(poll.channel.id).fetch_message(poll.id)
+
+
+
 
     @reminder.error
     async def reminder_error(self, ctx: commands.Context, error: commands.CommandError):
@@ -213,40 +237,60 @@ class basic(commands.Cog):
         await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
-    @commands.command()
-    async def reminder_self(self, ctx, date: str, *message):
-        # reminder for self only
-        try:
-            reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
-        except Exception as e:
-            await ctx.author.send(e)
+    @tasks.loop(seconds=30)
+    async def check_reminders(self):
+        results = self.test.get_reminders()
+    #     return a list of reminders on current time
+        if results is None:
+            return
         else:
-            today = datetime.now()
-            diff = (reminder - today).total_seconds()
-            # find the difference in seconds and wait
-            msg = " ".join(message)
-            await ctx.author.send("a reminder is set up for " + date + " for " + msg)
-            await asyncio.sleep(diff)
-            # reminder sleeping
-            await ctx.author.send("Reminder: " + msg)
-            
+            for reminder in results:
+                channelid = reminder[0]
+                title = reminder[1]
+                description = reminder[2]
+                channel = self.bot.get_channel(channelid)
+                embed = Embed(
+                    title = title,
+                    description = description,
+                    timestamp=datetime.utcnow()
+                )
+                await channel.send(embed = embed)
 
-    @reminder_self.error
-    async def reminder_self_error(self, ctx: commands.Context, error: commands.CommandError):
-        # reminder error handling
-        if isinstance(error, commands.CommandOnCooldown):
-            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
-        elif isinstance(error, commands.MissingPermissions):
-            message = "You are missing the required permissions to run this command!"
-        elif isinstance(error, commands.MissingRequiredArgument):
-            message = f"Missing a required argument: {error.param}"
-        elif isinstance(error, commands.ConversionError):
-            message = str(error)
-        else:
-            message = "Oh no! Something went wrong while running the command!"
 
-        await ctx.author.send(message, delete_after=10)
-        # await ctx.message.delete(delay=5)
+    # @commands.command()
+    # async def reminder_self(self, ctx, date: str, *message):
+    #     # reminder for self only
+    #     try:
+    #         reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
+    #     except Exception as e:
+    #         await ctx.author.send(e)
+    #     else:
+    #         today = datetime.now()
+    #         diff = (reminder - today).total_seconds()
+    #         # find the difference in seconds and wait
+    #         msg = " ".join(message)
+    #         await ctx.author.send("a reminder is set up for " + date + " for " + msg)
+    #         await asyncio.sleep(diff)
+    #         # reminder sleeping
+    #         await ctx.author.send("Reminder: " + msg)
+    #
+    #
+    # @reminder_self.error
+    # async def reminder_self_error(self, ctx: commands.Context, error: commands.CommandError):
+    #     # reminder error handling
+    #     if isinstance(error, commands.CommandOnCooldown):
+    #         message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+    #     elif isinstance(error, commands.MissingPermissions):
+    #         message = "You are missing the required permissions to run this command!"
+    #     elif isinstance(error, commands.MissingRequiredArgument):
+    #         message = f"Missing a required argument: {error.param}"
+    #     elif isinstance(error, commands.ConversionError):
+    #         message = str(error)
+    #     else:
+    #         message = "Oh no! Something went wrong while running the command!"
+    #
+    #     await ctx.author.send(message, delete_after=10)
+    #     # await ctx.message.delete(delay=5)
 
     
 def setup(bot):
