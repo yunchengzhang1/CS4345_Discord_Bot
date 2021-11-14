@@ -147,6 +147,20 @@ class database_func:
         self.connection.commit()
         print("update %s successfully" % classname)
 
+    def add_activity(self, userid, activity):
+        insert_stmt = "insert into Activities (user_id,activity)""Values (%s,%s)"
+        data = [userid, activity]
+        self.cursor.execute(insert_stmt, data)
+        self.connection.commit()
+        print("Inserted " + activity + " successfully")
+
+    def update_activity(self,userid,activity):
+        update_stmt = "update Activities set time = time+10 where user_id =%s and activity =%s"
+        data = (userid,activity)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update %s successfully" % activity)
+
     def activity_exist(self, userid, activity):
         select_stmt = "SELECT * from Activities where user_id = %s and activity = %s"
         data = (userid, activity)
@@ -208,31 +222,41 @@ class database_func:
         return results
     #     return lists of approached reminders
 
-
-
-
-
-
-
-
-
-    def add_activity(self, userid, activity):
-        insert_stmt = "insert into Activities (user_id,activity)""Values (%s,%s)"
-        data = [userid, activity]
-        self.cursor.execute(insert_stmt, data)
+    def add_meeting(self, meeting_id, channel_id, title, begin, end, location, description, creator):
+        insert_stmt = "insert into Meetings ""Values (%s,%s,%s,%s,%s,%s,%s,%s)"
+        data = [meeting_id, channel_id, title, begin, end, location, description, creator]
+        self.cursor.execute(insert_stmt,data)
         self.connection.commit()
-        print("Inserted successfully")
+        print("Inserted meeting successfully")
 
-    def update_activity(self,userid,activity):
-        update_stmt = "update Activities set time = time+10 where user_id =%s and activity =%s"
-        data = (userid,activity)
-        self.cursor.execute(update_stmt, data)
+    def get_meetings(self):
+        select_stmt = "select meeting_id, channel_id, meeting_title, begin_time, end_time,location, description  from Meetings where begin_time BETWEEN %s AND %s"
+        now_time = datetime.datetime.now(timezone('America/Chicago'))
+        past_time = now_time - datetime.timedelta(minutes=1)
+        now = now_time.strftime('%Y-%m-%d-%H:%M:%S')
+        past = past_time.strftime('%Y-%m-%d-%H:%M:%S')
+        data = (past, now)
+        self.cursor.execute(select_stmt, data)
+        results = self.cursor.fetchall()
+        return results
+
+    def get_meetings_within_10minutes(self):
+        select_stmt = "select meeting_id, channel_id, meeting_title, begin_time, end_time, location from Meetings where begin_time BETWEEN %s AND %s"
+        now_time = datetime.datetime.now(timezone('America/Chicago'))
+        past_time = now_time - datetime.timedelta(minutes=10)
+        now = now_time.strftime('%Y-%m-%d-%H:%M:%S')
+        past = past_time.strftime('%Y-%m-%d-%H:%M:%S')
+        data = (past, now)
+        self.cursor.execute(select_stmt, data)
+        results = self.cursor.fetchall()
+        return results
+
+    def add_participant_to_meetings(self, user_id,meeting_id):
+        insert_stmt = "insert into Participation (user_id, meeting_id) ""Values (%s,%s)"
+        data = [user_id,meeting_id]
+        self.cursor.execute(insert_stmt,data)
         self.connection.commit()
-        print("update %s successfully" % activity)
-
-
-
-
+        print("Inserted participants successfully")
 
 
     def disconnect(self):

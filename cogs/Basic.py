@@ -36,10 +36,9 @@ class basic(commands.Cog):
         self.test.delete_user(member.id)
 
     @commands.command()
-    async def dm(self, ctx, user: discord.Member, *message):
-        msg = " ".join(message)
-        embed = discord.Embed(title=msg)
-        await user.send(embed=embed)
+    async def dm(self, ctx, user: discord.Member):
+        USERID = user.id
+        await ctx.send(f"<@{USERID}>")
 
 
     @commands.command()

@@ -13,11 +13,15 @@ import math
 class UserActivity(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.test = database_func.getInstance()
+        self.playtime = {}
+
+    @commands.Cog.listener()
+    async def on_ready(self):
         self.collect_play_time.start()
         self.show_play_time.start()
         self.warn_play_time.start()
-        self.test = database_func.getInstance()
-        self.playtime = {}
+
 
     @commands.command()
     async def status(self, ctx, member: discord.Member):
