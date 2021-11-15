@@ -258,21 +258,11 @@ class Classes(commands.Cog):
         await ctx.send("Current existing classes: {}".format(self.test.print_all_class()))
 
     @commands.command()
-    async def add_task(self, ctx, title, difficulty, deadline, class_name):
-        format_deadline = '%Y-%m-%d-%H:%M'
-        try:
-            user_id = ctx.message.author.id
-            user_id = int(user_id / 100000000)
-            title = title
-            difficulty = int(difficulty)
-            deadline = datetime.strptime(deadline, format_deadline)
-
-
-        except Exception as e:
-            await ctx.send(e)
-        else:
-            self.test.add_task(user_id, title, difficulty, deadline, class_name)
-            await ctx.send("Task added")
+    # add_task will add a task to the table Tasks. Tasks has these columns: task_id(The discord message id), user_id(the discord author id), channel_id(the discord channel id), task_name(the task name), task_description(the details of the task), difficulty(int 1-10),deadline(the deadline of the task format_deadline = '%Y-%m-%d-%H:%M')
+    async def add_task(self, ctx, task_name, task_description, difficulty, deadline):
+        self.test.add_task(task_name, task_description, difficulty, deadline)
+        await ctx.send("Task {} has been added to the table".format(task_name))
+    
 
     @add_task.error
     async def add_task_error(self, ctx: commands.context, error: commands.CommandError):
@@ -328,30 +318,15 @@ class Classes(commands.Cog):
 
         await ctx.send(message, delete_after=10)
 
+    #uses database_func get_tasks_all based on user_id and days both are parameters. Gets all tasks for a user in the last x days 
     @commands.command()
-    async def taskm(self, ctx):
-        user_id = int(ctx.message.author.id / 100000000)
-        x = self.test.get_tasks_month(user_id)
-        tasks_as_user = [a for a in x if a[1] == user_id]
-        await ctx.send("There are {} tasks due in the next month".format(len(tasks_as_user)))
-        for i in x:
-            if i[1] == user_id:
-                s = "{} is due on {} with difficulty {} and for class {}".format(i[2], i[4], i[3], i[5])
-                await ctx.send(s)
-        # await ctx.send("List of tasks due the next thirty days: {}".format(self.test.get_tasks_month(int(ctx.message.author.id)/100000000)))
-
+    async def taskall(self, ctx, days):
+        await ctx.send(self.test.get_tasks_all(ctx.message.author.id, days))
+    
+    #uses database_func get_tasks_channel_specific based on user_id and days both are parameters. Gets all tasks for a user in the last x days in a specific channel
     @commands.command()
-    async def taskw(self, ctx):
-        user_id = int(ctx.message.author.id / 100000000)
-        x = self.test.get_tasks_week(user_id)
-        tasks_as_user = [a for a in x if a[1] == user_id]
-        await ctx.send("There are {} tasks due in the next week".format(len(tasks_as_user)))
-        for i in x:
-            if i[1] == user_id:
-                s = "{} is due on {} with difficulty {} and for class {}".format(i[2], i[4], i[3], i[5])
-                await ctx.send(s)
-        # await ctx.send("List of tasks due the next thirty days: {}".format(self.test.get_tasks_month(int(ctx.message.author.id)/100000000)))
-
+    async def tasks(self, ctx, days):
+        await ctx.send(self.test.get_tasks_channel_specific(ctx.message.author.id, days, ctx.channel.id))
 
 def setup(bot):
     bot.add_cog(Classes(bot))
