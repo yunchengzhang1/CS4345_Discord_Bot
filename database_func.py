@@ -61,9 +61,9 @@ class database_func:
         print("Inserted successfully")
 
     # add_task will add a task to the table Tasks. Tasks has these columns: task_id(The discord message id), user_id(the discord author id), channel_id(the discord channel id), task_name(the task name), task_description(the details of the task), difficulty(int 1-10),deadline(the deadline of the task)
-    def add_task(self, task_id, user_id, task_name, task_description, difficulty, deadline, class_name):
-        insert_stmt = "insert into Tasks (task_id, user_id, task_name, task_description, difficulty, deadline, class_name)""Values (%s, %s, %s, %s, %s, %s, %s)"
-        data = (task_id, user_id, task_name, task_description, difficulty, deadline, class_name)
+    def add_task(self, task_id, user_id, channel_id, task_name, task_description, difficulty, deadline):
+        insert_stmt = "insert into Tasks (task_id, user_id, channel_id, task_name, task_description, difficulty, deadline)""Values (%s, %s, %s, %s, %s, %s, %s)"
+        data = (task_id, user_id, channel_id, task_name, task_description, difficulty, deadline)
         self.cursor.execute(insert_stmt, data)
         self.connection.commit()
         print("Inserted successfully")

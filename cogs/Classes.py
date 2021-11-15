@@ -257,11 +257,12 @@ class Classes(commands.Cog):
     async def getClasses(self, ctx):
         await ctx.send("Current existing classes: {}".format(self.test.print_all_class()))
 
+
+    #Parameters for add_task: task_id(The discord message id), user_id(the discord author id), channel_id(the discord channel id), task_name(the task name), task_description(the details of the task), difficulty(int 1-10),deadline(the deadline of the task)
     @commands.command()
-    # add_task will add a task to the table Tasks. Tasks has these columns: task_id(The discord message id), user_id(the discord author id), channel_id(the discord channel id), task_name(the task name), task_description(the details of the task), difficulty(int 1-10),deadline(the deadline of the task format_deadline = '%Y-%m-%d-%H:%M')
     async def add_task(self, ctx, task_name, task_description, difficulty, deadline):
-        self.test.add_task(task_name, task_description, difficulty, deadline)
-        await ctx.send("Task {} has been added to the table".format(task_name))
+        self.test.add_task(ctx.message.id, ctx.message.author.id, ctx.channel.id, task_name, task_description, difficulty, deadline)
+        await ctx.send("Task {} has been added".format(task_name))
     
 
     @add_task.error
@@ -321,12 +322,12 @@ class Classes(commands.Cog):
     #uses database_func get_tasks_all based on user_id and days both are parameters. Gets all tasks for a user in the last x days 
     @commands.command()
     async def taskall(self, ctx, days):
-        await ctx.send(self.test.get_tasks_all(ctx.message.author.id, days))
+        await ctx.send(self.test.get_tasks_user_all(ctx.message.author.id, days))
     
     #uses database_func get_tasks_channel_specific based on user_id and days both are parameters. Gets all tasks for a user in the last x days in a specific channel
     @commands.command()
     async def tasks(self, ctx, days):
-        await ctx.send(self.test.get_tasks_channel_specific(ctx.message.author.id, days, ctx.channel.id))
+        await ctx.send(self.test.get_tasks_channel_specific(ctx.channel.id, ctx.message.author.id, days))
 
 def setup(bot):
     bot.add_cog(Classes(bot))
