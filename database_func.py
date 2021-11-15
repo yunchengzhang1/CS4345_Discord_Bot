@@ -60,30 +60,26 @@ class database_func:
         self.connection.commit()
         print("Inserted successfully")
 
-    def add_task(self,user_id,task_name, diff, deadline, class_name):
-        insert_stmt = "insert into Tasks (user_id,task_name,difficulty,deadline,class_name)""Values (%s,%s,%s,%s,%s)"
-        data = [user_id , task_name , diff , deadline , class_name]
-        self.cursor.execute(insert_stmt,data)
+    # add_task will add a task to the table Tasks. Tasks has these columns: task_id(The discord message id), user_id(the discord author id), channel_id(the discord channel id), task_name(the task name), task_description(the details of the task), difficulty(int 1-10),deadline(the deadline of the task)
+    def add_task(self, task_id, user_id, channel_id, task_name, task_description, difficulty, deadline):
+        insert_stmt = "insert into Tasks (task_id, user_id, channel_id, task_name, task_description, difficulty, deadline)""Values (%s, %s, %s, %s, %s, %s, %s)"
+        data = (task_id, user_id, channel_id, task_name, task_description, difficulty, deadline)
+        self.cursor.execute(insert_stmt, data)
         self.connection.commit()
         print("Inserted successfully")
         
-        
-    def get_tasks_month(self,user_id:int):
-        select_stmt = "SELECT * from Tasks t where t.user_id = %s and DATEDIFF(t.deadline,NOW()) < 30"
-        data = (user_id,)
-        self.cursor.execute(select_stmt,data)
+    #get_tasks_channel_specific will return all the tasks in a specific channel and specific user, it takes in a channel id, user id, and the number of days to look forward
+    def get_tasks_channel_specific(self, channel_id, user_id, days):
+        select_stmt = "SELECT * from Tasks t where t.channel_id = %s and t.user_id = %s and DATEDIFF(t.deadline,NOW()) < %s"
+        data = (channel_id, user_id, days)
+        self.cursor.execute(select_stmt, data)
         results = self.cursor.fetchall()
-        for x in results:
-            print(x)
         return results
-    
-    def get_tasks_week(self,user_id:int):
-        select_stmt = "SELECT * from Tasks t where t.user_id = %s and DATEDIFF(t.deadline,NOW()) < 7"
-        data = (user_id,)
-        self.cursor.execute(select_stmt,data)
+    def get_tasks_user_all(self, user_id,days):
+        select_stmt = "SELECT * from Tasks t where t.user_id = %s and DATEDIFF(t.deadline,NOW()) < %s"
+        data = (user_id,days)
+        self.cursor.execute(select_stmt, data)
         results = self.cursor.fetchall()
-        for x in results:
-            print(x)
         return results
         
     def delete_user(self, userid):
