@@ -29,7 +29,8 @@ class basic(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        self.test.add_user(member.id, member.name)
+        if not member.bot:
+            self.test.add_user(member.id, member.name)
 
     @commands.Cog.listener()
     async def on_member_leave(self,member):
