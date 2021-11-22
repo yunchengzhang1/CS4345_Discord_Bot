@@ -47,9 +47,9 @@ class database_func:
         self.connection.commit()
         print("Inserted successfully")
 
-    def add_class(self, class_name:str, server:str):
-        insert_stmt = "insert into Classes (class_name,servers)""Values (%s, %s)"
-        data = (class_name, server)
+    def add_class(self, class_name:str, channel_id:int, role_id:int, user_id:int):
+        insert_stmt = "insert into Classes (channel_id, class_name, role_id, user_id)""Values (%s,%s,%s,%s)"
+        data = (channel_id,class_name,role_id,user_id)
         self.cursor.execute(insert_stmt, data)
         self.connection.commit()
 

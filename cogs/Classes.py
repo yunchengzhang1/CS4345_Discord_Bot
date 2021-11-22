@@ -209,10 +209,15 @@ class Classes(commands.Cog):
     #             await asyncio.sleep(900)
     #             await ctx.send(title + " meeting time has come")
 
-    @commands.command(name="addClass")  # Create a new class
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.add_members_to_class.start()
+        self.check_meetings.start()
+    
+    @commands.command(name="addClass")# Create a new class
     @commands.has_permissions(manage_roles=True)
-    async def add_class(self, ctx, class_name: str, server_name: str):
-        self.test.add_class(class_name, server_name)
+    async def add_class(self, ctx, class_name: str):
         guild = ctx.guild
         if ctx.author.guild_permissions.manage_channels:
             role = await guild.create_role(name=class_name, colour=discord.Colour(0xff0000))
@@ -222,8 +227,14 @@ class Classes(commands.Cog):
             member = guild.default_role
             await newChannel.set_permissions(member, view_channel=False)
             await newChannel.set_permissions(role, view_channel=True, send_messages=True)
+            channel_id = newChannel.id
+            role_id = role.id
             message = await ctx.send(f'Class `{class_name}` has been created! \nReact below to join.')
-            reaction = await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
+            user_id = message.author.id
+            await message.add_reaction('👍')
+        self.test.add_class(class_name,channel_id,role_id,user_id)
+    
+    
 
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
     async def getUsersInClass(self, ctx, class_id):
