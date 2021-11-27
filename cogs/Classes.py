@@ -1,9 +1,10 @@
 from discord.ext import commands, tasks
-from discord import Embed
+from discord import Embed, message
 import discord
 import discord as d
 from discord import channel
 from discord import guild
+from discord.ext.commands.core import command
 from database_func import database_func
 from datetime import datetime
 import asyncio
@@ -209,11 +210,6 @@ class Classes(commands.Cog):
     #             await asyncio.sleep(900)
     #             await ctx.send(title + " meeting time has come")
 
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.add_members_to_class.start()
-        self.check_meetings.start()
     
     @commands.command(name="addClass")# Create a new class
     @commands.has_permissions(manage_roles=True)
@@ -229,10 +225,25 @@ class Classes(commands.Cog):
             await newChannel.set_permissions(role, view_channel=True, send_messages=True)
             channel_id = newChannel.id
             role_id = role.id
-            message = await ctx.send(f'Class `{class_name}` has been created! \nReact below to join.')
+            message = await ctx.send(f'Class `{class_name}` has been created! \nUse !join`{class_name}` to join.')
             user_id = message.author.id
-            await message.add_reaction('👍')
+            # await message.add_reaction('👍')
         self.test.add_class(class_name,channel_id,role_id,user_id)
+    
+    @commands.command(name="join")
+    async def join(self,ctx,class_name:str):
+        guild = ctx.guild
+        role = discord.utils.get(guild.roles,name=class_name)
+        authour = ctx.message.author
+        await authour.add_roles(role)
+    
+    @commands.command(name="leave")
+    async def leave(self,ctx,class_name:str):
+        guild = ctx.guild
+        role = discord.utils.get(guild.roles,name=class_name)
+        authour = ctx.message.author
+        await authour.remove_roles(role)
+        
     
     
 
@@ -250,19 +261,25 @@ class Classes(commands.Cog):
         await ctx.send("Current existing users: {}".format(self.test.print_all_users()))
 
     @commands.command(name="deleteClass")
-    async def deleteClass(self, ctx, class_name,
-                          channel: d.TextChannel):  # Take class_name input as string and then deletes class from table
+    async def deleteClass(self, ctx, class_name: str):  # Take class_name input as string and then deletes class from table
         self.test.delete_class(class_name)
-        role_object = discord.utils.get(ctx.message.guild.roles, name=class_name)
-        await ctx.send("Deleted class: {}".format(class_name))
-        await role_object.delete()
         mbed = d.Embed(
             tile='Success',
             description="{} has been successfully deleted.".format(class_name)
         )
         if ctx.author.guild_permissions.manage_channels:
-            await ctx.send(embed=mbed)
-            await channel.delete()
+            Dchannel = discord.utils.get(ctx.guild.channels,name = class_name)
+            print(Dchannel.id)
+            if Dchannel is not None:
+                await ctx.send(embed=mbed)
+                await Dchannel.delete()
+            else:
+                await ctx.send(f'No class named, "{class_name}", was found')
+            
+        
+        role_object = discord.utils.get(ctx.message.guild.roles, name=class_name)
+        await ctx.send("Deleted class: {}".format(class_name))
+        await role_object.delete()
 
     @commands.command(name="getClasses")
     async def getClasses(self, ctx):
@@ -291,20 +308,6 @@ class Classes(commands.Cog):
 
         await ctx.send(message, delete_after=10)
 
-    @commands.command(name="deleteClass")
-    async def deleteClass(self, ctx, class_name,
-                          channel: d.TextChannel):  # Take class_name input as string and then deletes class from table
-        self.test.delete_class(class_name)
-        role_object = discord.utils.get(ctx.message.guild.roles, name=class_name)
-        await ctx.send("Deleted class: {}".format(class_name))
-        await role_object.delete()
-        mbed = d.Embed(
-            tile='Success',
-            description="{} has been successfully deleted.".format(class_name)
-        )
-        if ctx.author.guild_permissions.manage_channels:
-            await ctx.send(embed=mbed)
-            await channel.delete()
 
     @commands.command()
     async def delete_task(self, ctx, task_name):

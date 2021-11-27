@@ -19,7 +19,7 @@ class UserActivity(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.collect_play_time.start()
-        self.show_play_time.start()
+        # self.show_play_time.start()
         self.warn_play_time.start()
 
 
