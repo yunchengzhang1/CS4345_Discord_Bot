@@ -199,6 +199,22 @@ class database_func:
         print("update successfully")
     #     the user is warned
 
+    def change_warned(self,userid):
+        update_stmt = "update Users set is_warned =0 where user_id =%s"
+        data = (userid,)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update successfully")
+    #     change warning status
+    def change_play_time_limit(self, userid, time):
+        update_stmt = "update Users set playtime_limit =%s where user_id =%s"
+        data = (time, userid)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update successfully")
+
+
+
     def add_reminder(self,reminder_id, channel_id, user_id, reminder_time, title, description):
         insert_stmt = "insert into Reminders (reminder_id, channel_id, user_id, reminder_time, reminder_title,reminder_description)""Values (%s,%s,%s,%s,%s,%s)"
         data = [reminder_id , channel_id , user_id , reminder_time , title, description]

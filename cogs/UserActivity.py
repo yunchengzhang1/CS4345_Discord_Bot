@@ -19,9 +19,15 @@ class UserActivity(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.collect_play_time.start()
-        # self.show_play_time.start()
+        self.show_play_time.start()
         self.warn_play_time.start()
+        self.change_warned_status.start()
 
+    @commands.command()
+    async def change_playtime(self, ctx, time):
+        self.test.change_play_time_limit(ctx.author.id, time)
+        await ctx.send(ctx.author.name + " has updated his playtime limit to " + str(time) )
+        return
 
     @commands.command()
     async def status(self, ctx, member: discord.Member):
@@ -252,6 +258,15 @@ class UserActivity(commands.Cog):
                     #             await member.send(msg)
                     #     except:
                     #         print("cannot send to this user")
+
+
+    @tasks.loop(hours=24)
+    async def change_warned_status(self):
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                # get all members in a server
+                if not member.bot:
+                    self.test.change_warned(member.id)
 
     @tasks.loop(hours=12)
     async def show_play_time(self):
