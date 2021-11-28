@@ -1,4 +1,4 @@
-# CS4345_Discord_Bot
+# Event Scheduler 
 
 First install [Python3](https://www.python.org/downloads/). 
 
@@ -8,7 +8,7 @@ Next, create a ```.env``` file with ```DISCORD_TOKEN = {your bot's discord token
 
 After that, the bot should run. 
 
-# Event Scheduler Functionalities 
+# Functionalities 
 
 Event Scheduler Allows you to schedule your activities and check your game time. 
 
