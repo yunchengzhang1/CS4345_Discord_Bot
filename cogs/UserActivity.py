@@ -19,10 +19,11 @@ class UserActivity(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print("READy")
-        # self.collect_play_time.start()
+        self.collect_play_time.start()
         # self.show_play_time.start()
-        # self.warn_play_time.start()
-        # self.change_warned_status.start()
+        self.warn_play_time.start()
+        self.change_warned_status.start()
+        self.clear_playtime.start()
 
     @commands.command()
     async def change_playtime(self, ctx, time:float):
@@ -81,6 +82,11 @@ class UserActivity(commands.Cog):
                 act_seconds) + " seconds\n"
 
         await ctx.send(msg)
+
+    @tasks.loop(hours=24)
+    async def clear_playtime(self):
+        self.test.clear_activity()
+        return
 
     @tasks.loop(seconds=10)
     async def collect_play_time(self):

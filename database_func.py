@@ -143,6 +143,12 @@ class database_func:
         self.connection.commit()
         print("update %s successfully" % classname)
 
+    def clear_activity(self):
+        delete_stmt = "truncate table Activities"
+        self.cursor.execute(delete_stmt)
+        self.connection.commit()
+        print("clear activity successfully")
+
     def add_activity(self, userid, activity):
         insert_stmt = "insert into Activities (user_id,activity)""Values (%s,%s)"
         data = [userid, activity]
