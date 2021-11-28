@@ -1,5 +1,5 @@
 from discord.ext import commands, tasks
-from discord import Embed, message
+from discord import Embed, message, user
 import discord
 import discord as d
 from discord import channel
@@ -243,6 +243,17 @@ class Classes(commands.Cog):
         role = discord.utils.get(guild.roles,name=class_name)
         authour = ctx.message.author
         await authour.remove_roles(role)
+    
+    @commands.command(name="kick")
+    @commands.has_permissions(manage_roles=True)
+    async def kick(self,ctx, member: discord.Member,class_name: str):
+        guild = ctx.guild
+        if ctx.author.guild_permissions.administrator:
+            role = discord.utils.get(guild.roles,name=class_name)
+            await member.remove_roles(role)
+            await ctx.send(f'User `{member}` has been kicked!')
+        
+        
         
     
     
