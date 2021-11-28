@@ -255,10 +255,10 @@ class database_func:
     def get_meetings_within_10minutes(self):
         select_stmt = "select meeting_id, channel_id, meeting_title, begin_time, end_time, location from Meetings where begin_time BETWEEN %s AND %s"
         now_time = datetime.datetime.now(timezone('America/Chicago'))
-        past_time = now_time - datetime.timedelta(minutes=10)
+        future_time = now_time + datetime.timedelta(minutes=10)
         now = now_time.strftime('%Y-%m-%d-%H:%M:%S')
-        past = past_time.strftime('%Y-%m-%d-%H:%M:%S')
-        data = (past, now)
+        future = future_time.strftime('%Y-%m-%d-%H:%M:%S')
+        data = (now, future)
         self.cursor.execute(select_stmt, data)
         results = self.cursor.fetchall()
         return results

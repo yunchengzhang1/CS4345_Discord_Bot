@@ -52,14 +52,26 @@ class basic(commands.Cog):
         embed.add_field(name="!ping", value="Pong", inline=False)
         embed.add_field(name="!test", value="Author test", inline=False)
         embed.add_field(name="!announcement title(str) *description(str)", value="Create an announcement", inline=False)
-        embed.add_field(name="!create_poll seconds(int) question(string) *options(string)", value="Create a poll",
+        embed.add_field(name="!create_poll hours question(string) *options(string)", value="Create a poll",
                         inline=False)
-        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder",
-                        inline=False)
-        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) *text(str)", value="Make a reminder",
+        embed.add_field(name="!reminder date(YYYY-MM-DD-HH:MM in 24 hour clock) title *text(str)", value="Make a reminder",
                         inline=False)
         embed.add_field(name="!status @[valid ping]", value="Check other's activity", inline=False)
         embed.add_field(name="!status_self", value="Check your time playing all video games", inline=False)
+        embed.add_field(name="!meeting title(str) begintime(YYYY-MM-DD-HH:MM in 24 hour clock) endtime(YYYY-MM-DD-HH:MM in 24 hour clock) location(str) *description", value="Create your meetings ", inline=False)
+        embed.add_field(name="!addClass classname(str)", value="Create a channel/class", inline=False)
+        embed.add_field(name="!join classname(str)", value="Join a channel/class", inline=False)
+        embed.add_field(name="!leave classname(str)", value="Leave a channel/class", inline=False)
+        embed.add_field(name="!kick @[valid ping] classname(str)", value="Kick someone from a channel/class", inline=False)
+        embed.add_field(name="!deleteClass classname(str)", value="Delete a channel/class",
+                        inline=False)
+        embed.add_field(name="!add_task taskname(str) description(str) difficulty(int) deadline(YYYY-MM-DD-HH:MM in 24 hour clock) ", value="Create a person task",
+                        inline=False)
+        embed.add_field(name="!delete_task task_name(str)", value="Delete a task", inline=False)
+        embed.add_field(name="!taskall day(int)", value="Get all tasks for a user in the server within given days", inline=False)
+        embed.add_field(name="!task day(int)", value="Get all tasks for a user in the channel within given days", inline=False)
+        embed.add_field(name="!change_playtime hours", value="Change your playtime limit ",
+                        inline=False)
 
         embed.set_footer(text="* value can be multiple values, other can only accept one value")
         await ctx.send(author, embed=embed)
@@ -112,7 +124,7 @@ class basic(commands.Cog):
     #     test latency
 
     @commands.command()
-    async def create_poll(self, ctx, seconds: int, question: str, *options):
+    async def create_poll(self, ctx, hours: float, question: str, *options):
         # create a poll
         if len(options) > 10:
             await ctx.send("You can only supply a maximum of 10 options.")
@@ -141,7 +153,7 @@ class basic(commands.Cog):
             await poll.pin()
             # pin polll
 
-            await asyncio.sleep(seconds)
+            await asyncio.sleep(hours*3600)
             # sleep for a designated time to wait for result
 
             message = await self.bot.get_channel(poll.channel.id).fetch_message(poll.id)
@@ -173,30 +185,6 @@ class basic(commands.Cog):
         await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
-    #
-    # @commands.command(name="reminder")
-    # async def reminder(self, ctx,date: str, title, *message):
-    #     # reminder group feature
-    #     try:
-    #         reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
-    #     except Exception as e:
-    #         await ctx.send(e)
-    #     else:
-    #         today = datetime.now()
-    #         diff = (reminder - today).total_seconds()
-    #         # find the difference in seconds and wait
-    #         msg = " ".join(message)
-    #         await ctx.send("a reminder is set up for " + date + " for " + title)
-    #         await asyncio.sleep(diff)
-    #         # reminder sleeping
-    #         embed = Embed(title="Reminder "+title,
-    #                       description=msg,
-    #                       colour=ctx.author.colour,
-    #                       timestamp=datetime.utcnow())
-    #         embed.set_author(name=ctx.author)
-    #         await ctx.send(embed =embed)
-    #         # time up
-
     @commands.command(name="reminder")
     async def reminder(self, ctx,date: str, title, *message):
         # reminder group feature
@@ -210,11 +198,6 @@ class basic(commands.Cog):
             message_sent = await ctx.send("a reminder is set up for " + date + " for " + title)
             # await ctx.send(message_sent.channel.id)
             self.test.add_reminder(message_sent.id,message_sent.channel.id,ctx.author.id, reminder, title,msg)
-
-
-
-
-
             # message = await self.bot.get_channel(poll.channel.id).fetch_message(poll.id)
 
 
@@ -237,7 +220,7 @@ class basic(commands.Cog):
         await ctx.send(message, delete_after=10)
         # await ctx.message.delete(delay=5)
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=60)
     async def check_reminders(self):
         results = self.test.get_reminders()
     #     return a list of reminders on current time
@@ -255,43 +238,6 @@ class basic(commands.Cog):
                     timestamp=datetime.utcnow()
                 )
                 await channel.send(embed = embed)
-
-
-    # @commands.command()
-    # async def reminder_self(self, ctx, date: str, *message):
-    #     # reminder for self only
-    #     try:
-    #         reminder = datetime.strptime(date, "%Y-%m-%d-%H:%M")
-    #     except Exception as e:
-    #         await ctx.author.send(e)
-    #     else:
-    #         today = datetime.now()
-    #         diff = (reminder - today).total_seconds()
-    #         # find the difference in seconds and wait
-    #         msg = " ".join(message)
-    #         await ctx.author.send("a reminder is set up for " + date + " for " + msg)
-    #         await asyncio.sleep(diff)
-    #         # reminder sleeping
-    #         await ctx.author.send("Reminder: " + msg)
-    #
-    #
-    # @reminder_self.error
-    # async def reminder_self_error(self, ctx: commands.Context, error: commands.CommandError):
-    #     # reminder error handling
-    #     if isinstance(error, commands.CommandOnCooldown):
-    #         message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
-    #     elif isinstance(error, commands.MissingPermissions):
-    #         message = "You are missing the required permissions to run this command!"
-    #     elif isinstance(error, commands.MissingRequiredArgument):
-    #         message = f"Missing a required argument: {error.param}"
-    #     elif isinstance(error, commands.ConversionError):
-    #         message = str(error)
-    #     else:
-    #         message = "Oh no! Something went wrong while running the command!"
-    #
-    #     await ctx.author.send(message, delete_after=10)
-    #     # await ctx.message.delete(delay=5)
-
     
 def setup(bot):
     bot.add_cog(basic(bot))

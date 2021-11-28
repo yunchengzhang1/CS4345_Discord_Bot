@@ -18,15 +18,19 @@ class UserActivity(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.collect_play_time.start()
-        self.show_play_time.start()
-        self.warn_play_time.start()
-        self.change_warned_status.start()
+        print("READy")
+        # self.collect_play_time.start()
+        # self.show_play_time.start()
+        # self.warn_play_time.start()
+        # self.change_warned_status.start()
 
     @commands.command()
-    async def change_playtime(self, ctx, time):
+    async def change_playtime(self, ctx, time:float):
+
+        await ctx.send(ctx.author.name + " has updated his playtime limit to " + str(time)+" hours" )
+        time = time * 3600
+        # convert hours to seconds
         self.test.change_play_time_limit(ctx.author.id, time)
-        await ctx.send(ctx.author.name + " has updated his playtime limit to " + str(time) )
         return
 
     @commands.command()
@@ -78,84 +82,6 @@ class UserActivity(commands.Cog):
 
         await ctx.send(msg)
 
-        # dict = self.playtime[ctx.author.name]
-        # playtime = 0
-        # streamtime = 0
-        # listentime = 0
-        # watchtime = 0
-        # customtime = 0
-        # competetime = 0
-        #
-        # for key in dict:
-        #     activityTime = dict[key]
-        #     # get certain activity time
-        #     activityHour = math.floor(activityTime / 3600)
-        #     # find the hours spend
-        #     activityTime = activityTime % 3600
-        #     # reduce the time to find minutes
-        #     activityMinute = math.floor(activityTime / 60)
-        #     # find the minute spend
-        #     activityTime = activityTime % 60
-        #     activitySecond = activityTime
-        #
-        #     msg = msg + key + " for " + str(activityHour) + " hours " + str(activityMinute) + " minutes " + str(
-        #         activitySecond) + " seconds\n"
-        #
-        #     if "playing" in key:
-        #         playtime = playtime + dict[key]
-        #     if "streaming" in key:
-        #         streamtime = streamtime + dict[key]
-        #     if "watching" in key:
-        #         watchtime = watchtime + dict[key]
-        #     if "listening" in key:
-        #         listentime = listentime + dict[key]
-        #     if "competing" in key:
-        #         competetime = competetime + dict[key]
-        #     if "custom" in key:
-        #         customtime = customtime + dict[key]
-        #
-        # if playtime != 0:
-        #     playHour = math.floor(playtime / 3600)
-        #     playtime = playtime % 3600
-        #     playMinute = math.floor(playtime / 60)
-        #     playtime = playtime % 60
-        #     playSecond = playtime
-        #     msg = msg + "Total play time: " + str(playHour) + " hours " + str(playMinute) + " minutes " + str(
-        #         playSecond) + " seconds \n"
-        # if streamtime != 0:
-        #     streamHour = math.floor(streamtime / 3600)
-        #     streamtime = streamtime % 3600
-        #     streamMinute = math.floor(streamtime / 60)
-        #     streamtime = streamtime % 60
-        #     streamSecond = streamtime
-        #     msg = msg + "Total stream time: " + str(streamHour) + " hours " + str(streamMinute) + " minutes " + str(
-        #         streamSecond) + " seconds \n"
-        # if watchtime != 0:
-        #     watchHour = math.floor(watchtime / 3600)
-        #     watchtime = watchtime % 3600
-        #     watchMinute = math.floor(watchtime / 60)
-        #     watchtime = watchtime % 60
-        #     watchSecond = watchtime
-        #     msg = msg + "Total watch time: " + str(watchHour) + " hours " + str(watchMinute) + " minutes " + str(
-        #         watchSecond) + " seconds \n"
-        # if customtime != 0:
-        #     customHour = math.floor(customtime / 3600)
-        #     customtime = customtime % 3600
-        #     customMinute = math.floor(customtime / 60)
-        #     customtime = customtime % 60
-        #     customSecond = customtime
-        #     msg = msg + "Total custom activity time: " + str(customHour) + " hours " + str(
-        #         customMinute) + " minutes " + str(customSecond) + " seconds \n"
-        # if competetime != 0:
-        #     competeHour = math.floor(competetime / 3600)
-        #     competetime = competetime % 3600
-        #     competeMinute = math.floor(competetime / 60)
-        #     competetime = competetime % 60
-        #     competeSecond = competetime
-        #     msg = msg + "Total compete time: " + str(competeHour) + " hours " + str(competeMinute) + " minutes " + str(
-        #         competeSecond) + " seconds \n"
-        # await ctx.send(msg)
-
     @tasks.loop(seconds=10)
     async def collect_play_time(self):
         for guild in self.bot.guilds:
@@ -178,38 +104,6 @@ class UserActivity(commands.Cog):
 
                         # get activity with user id and member activity
 
-    # @tasks.loop(seconds= 10)
-    # async def collect_play_time(self):
-    #     for guild in self.bot.guilds:
-    #         # get all servers that bots are in
-    #         for member in guild.members:
-    #             # get all members in a server
-    #             if not member.bot:
-    #                 # if user is not a bot
-    #                 if member.name not in self.playtime:
-    #                     # add user to the dict if not existed
-    #                     self.playtime[member.name] = {}
-    #
-    #                 if member.activity is not None:
-    #                     # start playing
-    #                     currActType = str(member.activity.type)
-    #                     if "ActivityType." in currActType:
-    #                         currActType = currActType.replace("ActivityType.", "")
-    #                     currActname = member.activity.name
-    #                     activity = currActType + " " + currActname
-    #                     if member.name in self.playtime:
-    #                         # user is in dict
-    #                         dict = self.playtime[member.name]
-    #                         if activity not in dict:
-    #                             dict[activity] = 0
-    #                             # starting to play a game
-    #                         else:
-    #                             dict[activity] += 10
-    #                             # continue playing a game
-    #                     else:
-    #                         self.playtime[member.name] = {activity: 0}
-    #                         # user is not in dict, record his activity rarely happens
-    #     #         this will check and record user activities every 5 seconds
 
     @tasks.loop(seconds=60)
     async def warn_play_time(self):
@@ -231,33 +125,6 @@ class UserActivity(commands.Cog):
                         except:
                             print("cannot send to this user")
                         self.test.is_warned(member.id)
-
-
-
-                    # dict = self.playtime[member.name]
-                    # activityTime = 0
-                    # for key in dict:
-                    #     activityTime = dict[key]
-                    #     # get certain activity time
-                    #     activityHour = math.floor(activityTime / 3600)
-                    #     # find the hours spend
-                    #     activityTime = activityTime % 3600
-                    #     # reduce the time to find minutes
-                    #     activityMinute = math.floor(activityTime / 60)
-                    #     # find the minute spend
-                    #     activityTime = activityTime % 60
-                    #     activitySecond = activityTime
-                    #
-                    #     msg = msg + key + " for " + str(activityHour) + " hours " + str(
-                    #         activityMinute) + " minutes " + str(activitySecond) + " seconds\n"
-                    #
-                    # if activityTime > 3600:
-                    #     try:
-                    #         if (msg != member.name):
-                    #             msg = msg + "You have exceeded your planned play time, please make sure that you are actively doing work\n"
-                    #             await member.send(msg)
-                    #     except:
-                    #         print("cannot send to this user")
 
 
     @tasks.loop(hours=24)
@@ -292,92 +159,6 @@ class UserActivity(commands.Cog):
                                 # we got some activity recorded
                         except:
                             print("cannot send to this user")
-
-
-                    # msg = member.name + "\n"
-                    # dict = self.playtime[member.name]
-                    # playtime = 0
-                    # streamtime = 0
-                    # listentime = 0
-                    # watchtime = 0
-                    # customtime = 0
-                    # competetime = 0
-                    #
-                    # for key in dict:
-                    #     activityTime = dict[key]
-                    #     # get certain activity time
-                    #     activityHour = math.floor(activityTime / 3600)
-                    #     # find the hours spend
-                    #     activityTime = activityTime % 3600
-                    #     # reduce the time to find minutes
-                    #     activityMinute = math.floor(activityTime / 60)
-                    #     # find the minute spend
-                    #     activityTime = activityTime % 60
-                    #     activitySecond = activityTime
-                    #
-                    #     msg = msg + key + " for " + str(activityHour) + " hours " + str(
-                    #         activityMinute) + " minutes " + str(activitySecond) + " seconds\n"
-                    #
-                    #     if "playing" in key:
-                    #         playtime = playtime + dict[key]
-                    #     if "streaming" in key:
-                    #         streamtime = streamtime + dict[key]
-                    #     if "watching" in key:
-                    #         watchtime = watchtime + dict[key]
-                    #     if "listening" in key:
-                    #         listentime = listentime + dict[key]
-                    #     if "competing" in key:
-                    #         competetime = competetime + dict[key]
-                    #     if "custom" in key:
-                    #         customtime = customtime + dict[key]
-                    #
-                    # if playtime != 0:
-                    #     playHour = math.floor(playtime / 3600)
-                    #     playtime = playtime % 3600
-                    #     playMinute = math.floor(playtime / 60)
-                    #     playtime = playtime % 60
-                    #     playSecond = playtime
-                    #     msg = msg + "Total play time: " + str(playHour) + " hours " + str(
-                    #         playMinute) + " minutes " + str(playSecond) + " seconds \n"
-                    # if streamtime != 0:
-                    #     streamHour = math.floor(streamtime / 3600)
-                    #     streamtime = streamtime % 3600
-                    #     streamMinute = math.floor(streamtime / 60)
-                    #     streamtime = streamtime % 60
-                    #     streamSecond = streamtime
-                    #     msg = msg + "Total stream time: " + str(streamHour) + " hours " + str(
-                    #         streamMinute) + " minutes " + str(streamSecond) + " seconds \n"
-                    # if watchtime != 0:
-                    #     watchHour = math.floor(watchtime / 3600)
-                    #     watchtime = watchtime % 3600
-                    #     watchMinute = math.floor(watchtime / 60)
-                    #     watchtime = watchtime % 60
-                    #     watchSecond = watchtime
-                    #     msg = msg + "Total watch time: " + str(watchHour) + " hours " + str(
-                    #         watchMinute) + " minutes " + str(watchSecond) + " seconds \n"
-                    # if customtime != 0:
-                    #     customHour = math.floor(customtime / 3600)
-                    #     customtime = customtime % 3600
-                    #     customMinute = math.floor(customtime / 60)
-                    #     customtime = customtime % 60
-                    #     customSecond = customtime
-                    #     msg = msg + "Total custom activity time: " + str(customHour) + " hours " + str(
-                    #         customMinute) + " minutes " + str(customSecond) + " seconds \n"
-                    # if competetime != 0:
-                    #     competeHour = math.floor(competetime / 3600)
-                    #     competetime = competetime % 3600
-                    #     competeMinute = math.floor(competetime / 60)
-                    #     competetime = competetime % 60
-                    #     competeSecond = competetime
-                    #     msg = msg + "Total compete time: " + str(competeHour) + " hours " + str(
-                    #         competeMinute) + " minutes " + str(competeSecond) + " seconds \n"
-                    # try:
-                    #     if (msg != member.name):
-                    #         await member.send(msg)
-                    #         # we got some activity recorded
-                    # except:
-                    #     print("cannot send to this user")
-
 
 def setup(bot):
     bot.add_cog(UserActivity(bot))

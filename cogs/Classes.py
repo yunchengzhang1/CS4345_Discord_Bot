@@ -42,7 +42,7 @@ class Classes(commands.Cog):
             await ctx.send(e)
         else:
             msg = ' '.join(description)
-            embed = Embed(title="Meeting" + title,
+            embed = Embed(title="Meeting: " + title,
                           description=msg,
                           colour=ctx.author.colour,
                           timestamp=datetime.utcnow())
@@ -54,25 +54,8 @@ class Classes(commands.Cog):
             await message.pin()
             await message.add_reaction('👍')
             await message.add_reaction('👎')
-            # today = datetime.now()
-            # diff = (valid_time - today).total_seconds()
-            # await ctx.send(title +" registration starts now and finishes at "+str(valid_until))
-            # await asyncio.sleep(diff)
             self.test.add_meeting(message.id, message.channel.id, title, start_time, finish_time, location, msg,
                                   ctx.author.id)
-            # await ctx.send("Registration finishes. "+title+ " will start at " + date)
-            # today = datetime.now()
-            # diff = (meettime - today).total_seconds()
-            # if diff < 900:
-            #     await ctx.send(title+ " is coming up within " +str(math.floor(diff/60)) +" minutes")
-            #     await asyncio.sleep(diff)
-            #     await ctx.send(title + " meeting time has come")
-            # else:
-            #     reminder_time = diff-900
-            #     await asyncio.sleep(reminder_time)
-            #     await ctx.send("15 Minutes until "+title)
-            #     await asyncio.sleep(900)
-            #     await ctx.send(title+ " meeting time has come")
 
     @meeting.error
     async def meeting_error(self, ctx: commands.Context, error: commands.CommandError):
@@ -119,7 +102,7 @@ class Classes(commands.Cog):
                 embed.add_field(name="Location ", value=location, inline=False)
                 await channel.send(embed=embed)
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(minutes=6)
     async def add_members_to_meetings(self):
         meetings = self.test.get_meetings_within_10minutes()
         if meetings is None:
@@ -162,54 +145,6 @@ class Classes(commands.Cog):
                 await channel.send("The following member will not come")
                 for ppl in lst_not_coming:
                     await channel.send(ppl)
-
-
-
-    # @commands.command()
-    # async def mand_meeting(self, ctx, title, date: str, location, *users:discord.Member):
-    # #     this is used for mandaytory meetings
-    #     try:
-    #         today = datetime.now()
-    #         meettime = datetime.strptime(date, "%Y-%m-%d-%H:%M")
-    #         if today >= meettime:
-    #             await ctx.send("Your meeting time must be after now")
-    #             return
-    #     except Exception as e:
-    #         await ctx.send(e)
-    #     else:
-    #
-    #         embed = Embed(title="Mandatory " +title,
-    #                       colour=ctx.author.colour,
-    #                       timestamp=datetime.utcnow())
-    #         embed.set_author(name=ctx.author)
-    #         embed.add_field(name="Date ", value=str(meettime), inline=False)
-    #         embed.add_field(name="Location ", value=location, inline=False)
-    #         await ctx.send(embed=embed)
-    #         await ctx.send("The following people have to come")
-    #
-    #         for user in users:
-    #             await ctx.send(user)
-    #
-    #
-    #         today = datetime.now()
-    #         diff = (meettime -today).total_seconds()
-    #         if diff < 900:
-    #             await ctx.send(title + " is coming up within " + str(math.floor(diff / 60)) + " minutes")
-    #             await ctx.send("The following people need to show up")
-    #             for user in users:
-    #                 await ctx.send(user)
-    #             await asyncio.sleep(diff)
-    #             await ctx.send(title + " meeting time has come")
-    #         else:
-    #             reminder_time = diff - 900
-    #             await asyncio.sleep(reminder_time)
-    #             await ctx.send("15 Minutes until " + title)
-    #             await ctx.send("The following people need to show up")
-    #             for user in users:
-    #                 await ctx.send(user)
-    #             await asyncio.sleep(900)
-    #             await ctx.send(title + " meeting time has come")
-
     
     @commands.command(name="addClass")# Create a new class
     @commands.has_permissions(manage_roles=True)
