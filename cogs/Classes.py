@@ -254,6 +254,32 @@ class Classes(commands.Cog):
 
         await ctx.send(message, delete_after=10)
 
+    @commands.command()
+    @commands.has_permissions(manage_roles=True)
+    async def assign_tasks(self, ctx,task_name, task_description, difficulty, deadline):
+        channel = self.bot.get_channel(ctx.channel.id)  # gets the channel you want to get the list from
+        members = channel.members  # finds members connected to the channel
+        for memeber in members:
+            self.test.add_task(ctx.message.id, memeber.id, ctx.channel.id, task_name, task_description,
+                               difficulty, deadline)
+        await ctx.send("Task {} has been added for everyone".format(task_name))
+
+    @assign_tasks.error
+    async def assign_tasks_error(self, ctx: commands.context, error: commands.CommandError):
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+
+        await ctx.send(message, delete_after=10)
+
+
 
     @commands.command()
     async def delete_task(self, ctx, task_name):
