@@ -8,4 +8,12 @@ Next, create a ```.env``` file with ```DISCORD_TOKEN = {your bot's discord token
 
 After that, the bot should run. 
 
-Event Scheduler Allows you to Schedule organizational/personal events at the same time. Additionally, it provides functionalities to keep track of your game time through discord activities.
+# Event Scheduler Functionalities 
+
+Event Scheduler Allows you to schedule your activities and check your game time. 
+
+It provides: 
+
+* Scheduling personal/organizational events
+* Monitoring daily activities
+* Creating announcements, reminders, polls within channels
