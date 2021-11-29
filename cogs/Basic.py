@@ -37,9 +37,10 @@ class basic(commands.Cog):
         self.test.delete_user(member.id)
 
     @commands.command()
-    async def dm(self, ctx, user: discord.Member):
-        USERID = user.id
-        await ctx.send(f"<@{USERID}>")
+    async def dm(self, ctx, user: discord.Member, *message):
+        msg = " ".join(message)
+        embed = discord.Embed(title=msg)
+        await user.send(embed=embed)
 
 
     @commands.command()
@@ -67,6 +68,10 @@ class basic(commands.Cog):
                         inline=False)
         embed.add_field(name="!add_task taskname(str) description(str) difficulty(int) deadline(YYYY-MM-DD-HH:MM in 24 hour clock) ", value="Create a person task",
                         inline=False)
+        embed.add_field(
+            name="!assign_tasks task_name(str) task_description(str) difficulty (int) deadline(YYYY-MM-DD-HH:MM in 24 hour clock)",
+            value="Assign tasks to everyone within the channel",
+            inline=False)
         embed.add_field(name="!delete_task task_name(str)", value="Delete a task", inline=False)
         embed.add_field(name="!taskall day(int)", value="Get all tasks for a user in the server within given days", inline=False)
         embed.add_field(name="!task day(int)", value="Get all tasks for a user in the channel within given days", inline=False)

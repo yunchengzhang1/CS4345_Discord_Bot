@@ -20,7 +20,7 @@ class UserActivity(commands.Cog):
     async def on_ready(self):
         print("READy")
         self.collect_play_time.start()
-        # self.show_play_time.start()
+        self.show_play_time.start()
         self.warn_play_time.start()
         self.change_warned_status.start()
         self.clear_playtime.start()
